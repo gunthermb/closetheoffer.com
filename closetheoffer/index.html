@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloseTheOffer — Job Search Dashboard That Actually Helps You Land the Job</title>
+<meta name="description" content="Track applications, prep for interviews, sync Gmail and Google Calendar, and search LinkedIn & Indeed — all in one place. Free to start. $9/mo for Pro.">
+<meta property="og:title" content="CloseTheOffer — Land your next job faster">
+<meta property="og:description" content="The job search dashboard with built-in interview prep, Gmail sync, and job board search. 78% cheaper than Huntr.">
+<meta property="og:type" content="website">
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; font-size: 16px; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Tokens ── */
+:root {
+  --purple: #6c5ce7;
+  --purple-dark: #5a4bd1;
+  --purple-light: #ede9ff;
+  --green: #00b894;
+  --red: #e17055;
+  --yellow: #fdcb6e;
+  --text: #1a1a2e;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --bg-subtle: #f8f7ff;
+  --bg-gray: #f8fafc;
+}
+
+/* ── Layout ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 80px 0; }
+.section-sm { padding: 56px 0; }
+.text-center { text-align: center; }
+
+/* ── Type ── */
+h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.1; }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+h3 { font-size: 1.125rem; font-weight: 700; }
+p { color: var(--muted); line-height: 1.7; }
+.eyebrow { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--purple); margin-bottom: 12px; display: block; }
+.lead { font-size: 1.125rem; color: var(--muted); line-height: 1.75; max-width: 580px; }
+
+/* ── Buttons ── */
+.btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 10px; padding: 14px 28px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap; }
+.btn-primary { background: var(--purple); color: #fff; }
+.btn-primary:hover { background: var(--purple-dark); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(108,92,231,.35); }
+.btn-secondary { background: #fff; color: var(--text); border: 2px solid var(--border); }
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+.btn-ghost { background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.3); }
+.btn-ghost:hover { background: rgba(255,255,255,.2); }
+.btn-sm { padding: 10px 18px; font-size: .875rem; border-radius: 8px; }
+.btn-lg { padding: 17px 36px; font-size: 1.0625rem; border-radius: 12px; }
+
+/* ── Nav ── */
+nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.nav-logo { font-size: 1.25rem; font-weight: 900; letter-spacing: -.03em; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: var(--purple); }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a { font-size: .875rem; font-weight: 600; color: var(--muted); transition: color .15s; }
+.nav-links a:hover { color: var(--text); }
+.nav-cta { display: flex; align-items: center; gap: 10px; }
+.mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
+/* ── Hero ── */
+.hero { background: linear-gradient(135deg, #1a1a2e 0%, #2d2b55 50%, #1a1a2e 100%); padding: 100px 0 80px; overflow: hidden; position: relative; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(108,92,231,.18) 0%, transparent 70%); }
+.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; position: relative; }
+.hero-content { color: #fff; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(108,92,231,.2); border: 1px solid rgba(108,92,231,.4); border-radius: 100px; padding: 6px 14px; font-size: .8125rem; font-weight: 700; color: #c4b5fd; margin-bottom: 24px; }
+.hero h1 { color: #fff; margin-bottom: 20px; }
+.hero h1 em { color: #a78bfa; font-style: normal; }
+.hero .lead { color: rgba(255,255,255,.75); margin-bottom: 36px; max-width: 480px; font-size: 1.0625rem; }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-social { margin-top: 28px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: rgba(255,255,255,.5); }
+.avatar-stack { display: flex; }
+.avatar-stack .av { width: 28px; height: 28px; border-radius: 50%; background: var(--purple); border: 2px solid #1a1a2e; margin-left: -8px; font-size: 11px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; }
+.avatar-stack .av:first-child { margin-left: 0; }
+
+/* ── Dashboard mockup ── */
+.dashboard-mockup { background: #fff; border-radius: 16px; box-shadow: 0 32px 80px rgba(0,0,0,.4); overflow: hidden; border: 1px solid rgba(255,255,255,.1); }
+.mock-titlebar { background: #f1f5f9; padding: 10px 14px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #e2e8f0; }
+.mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mock-dot.r { background: #fc5f58; }
+.mock-dot.y { background: #fdbc40; }
+.mock-dot.g { background: #34c84a; }
+.mock-url { flex: 1; background: #e2e8f0; border-radius: 6px; height: 22px; margin: 0 10px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; color: #94a3b8; }
+.mock-header { background: #1a1a2e; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+.mock-header-title { color: #fff; font-size: 12px; font-weight: 800; }
+.mock-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--purple); }
+.mock-tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; padding: 0 12px; background: #fff; }
+.mock-tab { padding: 7px 10px; font-size: 9px; font-weight: 700; color: #94a3b8; white-space: nowrap; }
+.mock-tab.active { color: var(--purple); border-bottom: 2px solid var(--purple); margin-bottom: -2px; }
+.mock-body { padding: 10px 12px; background: #f8f7ff; min-height: 160px; }
+.mock-pipeline { display: flex; gap: 6px; }
+.mock-col { background: #eef0f5; border-radius: 6px; padding: 6px; flex: 1; min-width: 0; }
+.mock-col-title { font-size: 7px; font-weight: 800; text-transform: uppercase; color: #94a3b8; margin-bottom: 5px; }
+.mock-card { background: #fff; border-radius: 4px; padding: 6px; margin-bottom: 4px; border-left: 2px solid var(--purple); }
+.mock-card .mc-co { font-size: 7px; font-weight: 800; color: #1a1a2e; }
+.mock-card .mc-role { font-size: 6px; color: #64748b; }
+.mock-card .mc-tag { display: inline-block; font-size: 5px; font-weight: 700; background: #ede9ff; color: var(--purple); border-radius: 2px; padding: 1px 3px; margin-top: 2px; }
+.mock-card.offer { border-left-color: #00b894; }
+.mock-card.offer .mc-co { color: #00b894; }
+
+/* ── Logos bar ── */
+.logos-bar { background: var(--bg-gray); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 20px 0; }
+.logos-inner { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; }
+.logo-pill { font-size: .75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: .1em; display: flex; align-items: center; gap: 6px; }
+.logo-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ── Problem section ── */
+.problem { background: var(--bg-gray); }
+.problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.problem-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+.problem-icon { font-size: 2rem; margin-bottom: 14px; }
+.problem-card h3 { margin-bottom: 8px; }
+.problem-card p { font-size: .9375rem; }
+
+/* ── Features ── */
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 56px; }
+.feature-card { }
+.feature-icon { width: 48px; height: 48px; background: var(--purple-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.375rem; margin-bottom: 16px; }
+.feature-card h3 { margin-bottom: 8px; }
+.feature-card p { font-size: .9375rem; }
+
+/* ── Feature spotlight ── */
+.spotlight { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 72px; }
+.spotlight:last-child { margin-bottom: 0; }
+.spotlight.reverse { direction: rtl; }
+.spotlight.reverse > * { direction: ltr; }
+.spotlight-text { }
+.spotlight-text ul { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.spotlight-text li { display: flex; align-items: flex-start; gap: 10px; font-size: .9375rem; color: var(--muted); }
+.spotlight-text li::before { content: '✓'; color: var(--purple); font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+.spotlight-visual { background: var(--bg-subtle); border-radius: 16px; padding: 24px; border: 1px solid var(--border); }
+
+/* ── Comparison table ── */
+.comparison { background: var(--bg-gray); }
+.compare-table { width: 100%; border-collapse: collapse; margin-top: 48px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.compare-table th { padding: 18px 20px; text-align: left; font-size: .8125rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--bg-gray); }
+.compare-table th.highlight { background: var(--purple); color: #fff; }
+.compare-table td { padding: 16px 20px; border-top: 1px solid var(--border); font-size: .9375rem; vertical-align: middle; }
+.compare-table td.feature-name { font-weight: 600; color: var(--text); }
+.compare-table td.highlight { background: var(--purple-light); color: var(--purple); font-weight: 700; }
+.compare-table tr:hover td { background: #fafaf9; }
+.compare-table tr:hover td.highlight { background: #e8e3ff; }
+.check { color: var(--green); font-size: 1.1rem; font-weight: 800; }
+.cross { color: #cbd5e1; font-size: 1.1rem; }
+.partial { color: var(--yellow); font-weight: 700; font-size: .875rem; }
+
+/* ── Pricing ── */
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 760px; margin: 48px auto 0; }
+.pricing-card { background: #fff; border: 2px solid var(--border); border-radius: 18px; padding: 36px; position: relative; }
+.pricing-card.popular { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(108,92,231,.08); }
+.popular-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--purple); color: #fff; font-size: .75rem; font-weight: 800; padding: 4px 16px; border-radius: 100px; white-space: nowrap; }
+.plan-name { font-size: .875rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
+.plan-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+.plan-price .amount { font-size: 2.75rem; font-weight: 900; letter-spacing: -.04em; color: var(--text); }
+.plan-price .per { font-size: .875rem; color: var(--muted); font-weight: 600; }
+.plan-annual { font-size: .8125rem; color: var(--green); font-weight: 700; margin-bottom: 24px; }
+.plan-desc { font-size: .9375rem; color: var(--muted); margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+.plan-features li { display: flex; align-items: center; gap: 10px; font-size: .9375rem; }
+.plan-features li .fi { width: 20px; height: 20px; border-radius: 50%; background: #e8fdf5; display: flex; align-items: center; justify-content: center; font-size: .75rem; flex-shrink: 0; }
+.plan-features li.disabled { color: #94a3b8; }
+.plan-features li.disabled .fi { background: #f1f5f9; }
+.savings-badge { background: #fff3cd; border: 1px solid #ffe58f; border-radius: 8px; padding: 10px 14px; font-size: .8125rem; font-weight: 700; color: #856404; text-align: center; margin-bottom: 16px; }
+
+/* ── Testimonials ── */
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.testimonial { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+.testimonial .stars { color: #f59e0b; font-size: .875rem; margin-bottom: 14px; }
+.testimonial .quote { font-size: .9375rem; color: var(--text); line-height: 1.65; margin-bottom: 18px; font-style: italic; }
+.testimonial .author { display: flex; align-items: center; gap: 10px; }
+.testimonial .av { width: 36px; height: 36px; border-radius: 50%; background: var(--purple-light); color: var(--purple); font-weight: 800; font-size: .875rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.testimonial .name { font-weight: 700; font-size: .875rem; }
+.testimonial .title { font-size: .8125rem; color: var(--muted); }
+
+/* ── FAQ ── */
+.faq-list { max-width: 720px; margin: 48px auto 0; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q { width: 100%; text-align: left; background: none; border: none; padding: 22px 0; font-size: 1rem; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.faq-q .arrow { font-size: .75rem; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+.faq-q.open .arrow { transform: rotate(180deg); }
+.faq-a { padding: 0 0 20px; font-size: .9375rem; color: var(--muted); line-height: 1.7; display: none; }
+.faq-a.open { display: block; }
+
+/* ── CTA band ── */
+.cta-band { background: linear-gradient(135deg, #4c3ce0 0%, #6c5ce7 50%, #8b5cf6 100%); padding: 80px 0; text-align: center; }
+.cta-band h2 { color: #fff; margin-bottom: 14px; }
+.cta-band p { color: rgba(255,255,255,.8); max-width: 460px; margin: 0 auto 36px; font-size: 1.0625rem; }
+.cta-band .btn-cta-primary { background: #fff; color: var(--purple); font-weight: 800; }
+.cta-band .btn-cta-primary:hover { background: #f5f3ff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+
+/* ── Footer ── */
+footer { background: #0f0e1a; color: rgba(255,255,255,.5); padding: 48px 0 32px; }
+.footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 40px; }
+.footer-brand { }
+.footer-logo { font-size: 1.125rem; font-weight: 900; color: #fff; margin-bottom: 12px; }
+.footer-logo span { color: #a78bfa; }
+.footer-tagline { font-size: .875rem; line-height: 1.6; }
+.footer-col h4 { font-size: .8125rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.7); margin-bottom: 14px; }
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer-col a { font-size: .875rem; transition: color .15s; }
+.footer-col a:hover { color: rgba(255,255,255,.8); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; font-size: .8125rem; }
+.footer-bottom a { margin-left: 20px; }
+.footer-bottom a:hover { color: rgba(255,255,255,.8); }
+
+/* ── Mini UI previews ── */
+.mini-kanban { font-family: inherit; }
+.mk-row { display: flex; gap: 8px; margin-bottom: 0; }
+.mk-col { background: #eef0f5; border-radius: 8px; padding: 8px; flex: 1; }
+.mk-col-title { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; letter-spacing: .05em; }
+.mk-card { background: #fff; border-radius: 5px; padding: 7px 8px; margin-bottom: 5px; border-left: 2px solid; }
+.mk-card .co { font-size: 10px; font-weight: 800; color: var(--text); }
+.mk-card .ro { font-size: 9px; color: var(--muted); margin-top: 1px; }
+.mk-card .tg { display: inline-block; font-size: 7px; font-weight: 700; border-radius: 2px; padding: 1px 4px; margin-top: 3px; }
+.tag-r { background: #e8f5e9; color: #2e7d32; }
+.tag-s { background: #ede9ff; color: var(--purple); }
+.tag-o { background: #e8fdf5; color: #1a7a50; }
+
+.mini-prep { background: #fff; border-radius: 8px; padding: 14px; border: 1px solid var(--border); }
+.mp-co { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--purple); margin-bottom: 2px; }
+.mp-role { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+.mp-section { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--purple); margin: 8px 0 4px; }
+.mp-item { font-size: 9px; color: var(--muted); margin-bottom: 3px; padding-left: 10px; position: relative; }
+.mp-item::before { content: '→'; position: absolute; left: 0; color: var(--purple); }
+.mp-keywords { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 6px; }
+.mp-kw { font-size: 8px; font-weight: 700; background: var(--purple-light); color: var(--purple); border-radius: 3px; padding: 1px 5px; }
+.mp-salary { background: #e8fdf5; border-radius: 5px; padding: 5px 8px; font-size: 9px; font-weight: 700; color: #1a7a50; margin-top: 6px; }
+
+.mini-search { background: #fff; border-radius: 8px; padding: 12px; border: 1px solid var(--border); }
+.ms-bar { display: flex; gap: 5px; margin-bottom: 10px; }
+.ms-input { flex: 1; border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; font-size: 9px; color: var(--muted); }
+.ms-btn { background: var(--purple); color: #fff; border: none; border-radius: 5px; padding: 5px 10px; font-size: 9px; font-weight: 700; }
+.ms-job { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; }
+.ms-job .jco { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
+.ms-job .jtitle { font-size: 11px; font-weight: 700; margin-bottom: 3px; }
+.ms-job .jmeta { font-size: 8px; color: var(--muted); margin-bottom: 5px; }
+.ms-job .jadd { background: var(--purple); color: #fff; border: none; border-radius: 4px; padding: 3px 8px; font-size: 8px; font-weight: 700; }
+.ms-source { font-size: 7px; font-weight: 700; background: #e8f5e9; color: #2e7d32; border-radius: 2px; padding: 1px 4px; margin-left: 4px; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .dashboard-mockup { display: none; }
+  .problem-grid, .features-grid, .testimonials-grid { grid-template-columns: 1fr; }
+  .spotlight { grid-template-columns: 1fr; gap: 32px; }
+  .spotlight.reverse { direction: ltr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  .nav-links { display: none; }
+  .mobile-menu-btn { display: block; }
+  .compare-table th:nth-child(3), .compare-table td:nth-child(3),
+  .compare-table th:nth-child(4), .compare-table td:nth-child(4) { display: none; }
+}
+@media (max-width: 600px) {
+  .section { padding: 56px 0; }
+  .hero { padding: 64px 0 56px; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .logos-inner { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">Close<span>TheOffer</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#compare">Compare</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-secondary btn-sm" id="nav-signin">Sign in</a>
+      <a href="#pricing" class="btn btn-primary btn-sm">Start free →</a>
+    </div>
+    <button class="mobile-menu-btn">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">
+        🚀 Built for engineers, architects &amp; tech professionals
+      </div>
+      <h1>Land your next job <em>faster.</em></h1>
+      <p class="lead">Pipeline tracking, interview prep, Gmail sync, and LinkedIn/Indeed search — all in one dashboard. 78% cheaper than Huntr.</p>
+      <div class="hero-ctas">
+        <a href="#pricing" class="btn btn-primary btn-lg">Start free — no credit card</a>
+        <a href="#features" class="btn btn-ghost btn-lg">See features →</a>
+      </div>
+      <div class="hero-social">
+        <div class="avatar-stack">
+          <div class="av">M</div>
+          <div class="av">J</div>
+          <div class="av">K</div>
+          <div class="av">A</div>
+          <div class="av" style="font-size:9px">+</div>
+        </div>
+        &nbsp;Join 500+ job seekers already using CloseTheOffer
+      </div>
+    </div>
+
+    <div class="dashboard-mockup">
+      <div class="mock-titlebar">
+        <div class="mock-dot r"></div><div class="mock-dot y"></div><div class="mock-dot g"></div>
+        <div class="mock-url">closetheoffer.com/dashboard</div>
+      </div>
+      <div class="mock-header">
+        <div class="mock-header-title">📋 CloseTheOffer</div>
+        <div class="mock-avatar"></div>
+      </div>
+      <div class="mock-tabs">
+        <div class="mock-tab active">📊 Pipeline</div>
+        <div class="mock-tab">📅 Interviews</div>
+        <div class="mock-tab">🔍 Job Search</div>
+        <div class="mock-tab">📋 Prep</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-pipeline">
+          <div class="mock-col">
+            <div class="mock-col-title">Applied</div>
+            <div class="mock-card"><div class="mc-co">Amazon AWS</div><div class="mc-role">Sr. Solutions Architect</div><div class="mc-tag">🏠 Remote</div></div>
+            <div class="mock-card"><div class="mc-co">Booz Allen</div><div class="mc-role">Cloud Lead</div><div class="mc-tag">TS/SCI</div></div>
+          </div>
+          <div class="mock-col">
+            <div class="mock-col-title">Screening</div>
+            <div class="mock-card"><div class="mc-co">Four Points</div><div class="mc-role">SA — Federal</div><div class="mc-tag">🏠 Remote</div></div>
+          </div>
+          <div class="mock-col">
+            <div class="mock-col-title">Interview</div>
+            <div class="mock-card"><div class="mc-co">Microsoft</div><div class="mc-role">Cloud Architect</div><div class="mc-tag">🏠 Remote</div></div>
+          </div>
+          <div class="mock-col">
+            <div class="mock-col-title" style="color:#00b894">Offer 🎉</div>
+            <div class="mock-card offer"><div class="mc-co">Accenture Fed</div><div class="mc-role">$210K · Start Aug 1</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Logos ── -->
+<div class="logos-bar">
+  <div class="container logos-inner">
+    <div class="logo-pill"><div class="logo-dot"></div> Gmail</div>
+    <div class="logo-pill"><div class="logo-dot"></div> Google Calendar</div>
+    <div class="logo-pill"><div class="logo-dot"></div> LinkedIn Jobs</div>
+    <div class="logo-pill"><div class="logo-dot"></div> Indeed</div>
+    <div class="logo-pill"><div class="logo-dot"></div> Glassdoor</div>
+    <div class="logo-pill"><div class="logo-dot"></div> ZipRecruiter</div>
+  </div>
+</div>
+
+<!-- ── Problem ── -->
+<section class="section problem" id="problem">
+  <div class="container text-center">
+    <span class="eyebrow">The Problem</span>
+    <h2>Job searching is a full-time job. Most tools make it harder.</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">🗂️</div>
+        <h3>Scattered across spreadsheets</h3>
+        <p>You're tracking jobs in a Google Sheet, prep notes in a doc, and interviews in a calendar. Nothing talks to each other.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <h3>Competitors charge way too much</h3>
+        <p>Huntr is $40/month with no interview prep. Teal is $29/month. You're paying for features you don't need while missing ones you do.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">😰</div>
+        <h3>No real interview prep</h3>
+        <p>Walking into an interview without a company brief, salary stance, and STAR stories ready? You're leaving offers on the table.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features overview ── -->
+<section class="section" id="features">
+  <div class="container text-center">
+    <span class="eyebrow">Everything in one place</span>
+    <h2>The job search command center you actually need</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Visual pipeline board</h3>
+        <p>Drag-and-drop kanban across New → Applied → Screening → Interview → Offer. See where every opportunity stands at a glance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Interview prep cards</h3>
+        <p>Company brief, talking points, salary stance, questions to ask, and a STAR story library — all organized per interview. No other tracker has this.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📬</div>
+        <h3>Gmail &amp; Calendar sync</h3>
+        <p>Surfaces recruiter emails and pulls interview events automatically. Zoom links, Teams links, and call numbers extracted from calendar invites.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Job board search</h3>
+        <p>Search LinkedIn, Indeed, Glassdoor, and ZipRecruiter directly — without leaving the dashboard. One click to add to your pipeline.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>STAR story library</h3>
+        <p>Write your behavioral interview stories once (Situation, Task, Action, Result) and reuse them across every interview. Categorized by Leadership Principle.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Action item tracker</h3>
+        <p>Follow-up tasks, pending callbacks, and email replies — organized by priority alongside your inbox scan so nothing slips through.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Feature spotlights ── -->
+<section class="section-sm" style="background:var(--bg-subtle)">
+  <div class="container">
+
+    <div class="spotlight">
+      <div class="spotlight-text">
+        <span class="eyebrow">Interview Prep</span>
+        <h2>Walk into every interview completely ready</h2>
+        <p>Other job trackers stop at the application. CloseTheOffer takes you to the offer. For each company in your pipeline, build a prep card with everything you need.</p>
+        <ul>
+          <li>Company overview and key talking points</li>
+          <li>Salary stance — what to say and what not to say</li>
+          <li>Questions to ask the interviewer</li>
+          <li>Watch-outs: red flags and compensation traps</li>
+          <li>STAR stories mapped to the specific role</li>
+        </ul>
+      </div>
+      <div class="spotlight-visual">
+        <div class="mini-prep">
+          <div class="mp-co">Accenture Federal</div>
+          <div class="mp-role">Cloud Architect / Technical Lead</div>
+          <div class="mp-section">Key Talking Points</div>
+          <div class="mp-item">Lead with Fannie Mae scale — 1,000+ server migration</div>
+          <div class="mp-item">Federal agency pedigree: DoS, DoJ, DISA, OPM</div>
+          <div class="mp-item">TS clearance eligible for immediate reinstatement</div>
+          <div class="mp-section">Keywords</div>
+          <div class="mp-keywords">
+            <span class="mp-kw">AWS GovCloud</span>
+            <span class="mp-kw">FedRAMP</span>
+            <span class="mp-kw">Terraform</span>
+            <span class="mp-kw">Zero Trust</span>
+            <span class="mp-kw">NIST 800-53</span>
+          </div>
+          <div class="mp-salary">💰 Target $195K–$210K — do NOT anchor low</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotlight reverse">
+      <div class="spotlight-text">
+        <span class="eyebrow">Job Board Search</span>
+        <h2>Find and track jobs without switching tabs</h2>
+        <p>Search LinkedIn, Indeed, Glassdoor, and ZipRecruiter directly from the dashboard. Filter by location, remote-only, or date posted. One click adds any listing to your pipeline.</p>
+        <ul>
+          <li>Live search across 4 major job boards at once</li>
+          <li>Filter: remote only, city, date posted</li>
+          <li>One-click "Add to Pipeline" — no copy-paste needed</li>
+          <li>Salary ranges surfaced where available</li>
+        </ul>
+      </div>
+      <div class="spotlight-visual">
+        <div class="mini-search">
+          <div class="ms-bar">
+            <div class="ms-input">Cloud Architect remote</div>
+            <button class="ms-btn">Search</button>
+          </div>
+          <div class="ms-job">
+            <div class="jco">Amazon AWS <span class="ms-source">LinkedIn</span></div>
+            <div class="jtitle">Senior Solutions Architect — WWPS</div>
+            <div class="jmeta">🏠 Remote · $180K–$220K · 2 days ago</div>
+            <button class="jadd">+ Add to Pipeline</button>
+          </div>
+          <div class="ms-job">
+            <div class="jco">Booz Allen Hamilton <span class="ms-source">Indeed</span></div>
+            <div class="jtitle">Cloud Security Architect Lead</div>
+            <div class="jmeta">Remote · $99K–$225K · Today</div>
+            <button class="jadd">+ Add to Pipeline</button>
+          </div>
+          <div class="ms-job">
+            <div class="jco">Microsoft <span class="ms-source">Glassdoor</span></div>
+            <div class="jtitle">Sr. Cloud Solution Architect — Federal</div>
+            <div class="jmeta">🏠 Remote · $143K–$196K · 1 day ago</div>
+            <button class="jadd">+ Add to Pipeline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spotlight">
+      <div class="spotlight-text">
+        <span class="eyebrow">Gmail + Calendar Sync</span>
+        <h2>Your inbox and calendar, surfaced automatically</h2>
+        <p>Connect once with Google OAuth. CloseTheOffer scans your Gmail for recruiter emails and your Calendar for interview events — and shows them right in the dashboard.</p>
+        <ul>
+          <li>Recruiter emails filtered from inbox noise</li>
+          <li>Interview events pulled from Google Calendar</li>
+          <li>Zoom, Teams, and phone numbers extracted automatically</li>
+          <li>Past 90 days of interviews — always visible</li>
+        </ul>
+      </div>
+      <div class="spotlight-visual">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="background:#fff; border-radius:8px; padding:12px 14px; border:1px solid var(--border); border-left:3px solid var(--purple);">
+            <div style="font-size:10px; font-weight:800; color:var(--purple); margin-bottom:2px;">📅 UPCOMING · Wed Jun 25 · 10:30 AM ET</div>
+            <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Amazon AWS — Phone Interview</div>
+            <div style="display:flex; gap:6px;">
+              <span style="font-size:9px; background:#e3f2fd; color:#1565c0; border-radius:4px; padding:2px 7px; font-weight:700;">🎥 Join Zoom</span>
+              <span style="font-size:9px; background:#ede9ff; color:var(--purple); border-radius:4px; padding:2px 7px; font-weight:700;">📋 Interview Prep</span>
+            </div>
+          </div>
+          <div style="background:#fff; border-radius:8px; padding:12px 14px; border:1px solid var(--border);">
+            <div style="font-size:10px; font-weight:700; margin-bottom:2px;">📬 Patrick Wallace &lt;pwallace@recruiter.com&gt;</div>
+            <div style="font-size:11px; font-weight:700; color:#444;">RE: Cloud Architect opportunity — submitted at $190K</div>
+            <div style="font-size:10px; color:var(--muted); margin-top:3px;">Hi Mike — I heard back from the client. They'd like to schedule a…</div>
+          </div>
+          <div style="background:#fff; border-radius:8px; padding:12px 14px; border:1px solid var(--border);">
+            <div style="font-size:10px; font-weight:700; margin-bottom:2px;">📬 Shaun Navarro &lt;shaunnav@amazon.com&gt;</div>
+            <div style="font-size:11px; font-weight:700; color:#444;">Amazon AWS — next steps in your interview process</div>
+            <div style="font-size:10px; color:var(--muted); margin-top:3px;">Congratulations on advancing to the next round. Your interview…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Comparison ── -->
+<section class="section comparison" id="compare">
+  <div class="container text-center">
+    <span class="eyebrow">Why CloseTheOffer</span>
+    <h2>More features. A fraction of the price.</h2>
+    <p style="max-width:560px; margin:0 auto;">Huntr charges $40/month and still doesn't include interview prep or Gmail sync. Teal is $29/month and focused on resume building. CloseTheOffer gives you the full picture for $9.</p>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th class="highlight">CloseTheOffer Pro<br><span style="font-size:.75rem; opacity:.85; text-transform:none; letter-spacing:0">$9/mo</span></th>
+          <th>Huntr Pro<br><span style="font-size:.75rem; opacity:.7; text-transform:none; letter-spacing:0">$40/mo</span></th>
+          <th>Teal+<br><span style="font-size:.75rem; opacity:.7; text-transform:none; letter-spacing:0">$29/mo</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name">Application pipeline (kanban)</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Interview prep cards</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">STAR story library</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Gmail sync (recruiter emails)</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Google Calendar sync</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Job board search (LinkedIn/Indeed)</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">Limited</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Action item tracker</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="partial">Basic</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">AI resume builder</td>
+          <td class="highlight"><span style="color:var(--muted); font-size:.8125rem">Coming soon</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name">Works offline / export data</td>
+          <td class="highlight"><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feature-name" style="font-weight:800; color:var(--purple)">Monthly price</td>
+          <td class="highlight" style="font-size:1.125rem; font-weight:900;">$9</td>
+          <td style="font-weight:700">$40</td>
+          <td style="font-weight:700">$29</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Pricing ── -->
+<section class="section" id="pricing">
+  <div class="container text-center">
+    <span class="eyebrow">Simple Pricing</span>
+    <h2>Free to start. Upgrade when you're ready.</h2>
+    <p style="max-width:480px; margin:0 auto;">No credit card required to start. Cancel anytime. Your data is always exportable.</p>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price"><span class="amount">$0</span><span class="per">/mo</span></div>
+        <div class="plan-annual">&nbsp;</div>
+        <div class="plan-desc">Perfect for getting started and trying out the core features.</div>
+        <ul class="plan-features">
+          <li><div class="fi">✓</div> Pipeline board (up to 10 cards)</li>
+          <li><div class="fi">✓</div> 3 interview prep cards</li>
+          <li><div class="fi">✓</div> 3 STAR stories</li>
+          <li><div class="fi">✓</div> Action item tracker</li>
+          <li><div class="fi">✓</div> Pipeline export / import</li>
+          <li class="disabled"><div class="fi" style="color:#94a3b8">✗</div> Gmail sync</li>
+          <li class="disabled"><div class="fi" style="color:#94a3b8">✗</div> Google Calendar sync</li>
+          <li class="disabled"><div class="fi" style="color:#94a3b8">✗</div> Job board search</li>
+          <li class="disabled"><div class="fi" style="color:#94a3b8">✗</div> Unlimited prep cards</li>
+        </ul>
+        <!-- Replace href with your actual app URL -->
+        <a href="/signup" class="btn btn-secondary" style="width:100%; justify-content:center;">Get started free</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card popular">
+        <div class="popular-badge">Most popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price"><span class="amount">$9</span><span class="per">/mo</span></div>
+        <div class="plan-annual">or $79/yr — save 27% · <strong style="color:var(--green)">2 months free</strong></div>
+        <div class="plan-desc">Everything you need to run a focused, organized job search — start to offer.</div>
+        <div class="savings-badge">💰 78% cheaper than Huntr · 69% cheaper than Teal</div>
+        <ul class="plan-features">
+          <li><div class="fi">✓</div> <strong>Unlimited</strong> pipeline cards</li>
+          <li><div class="fi">✓</div> <strong>Unlimited</strong> prep cards &amp; STAR stories</li>
+          <li><div class="fi">✓</div> Gmail sync — recruiter email surface</li>
+          <li><div class="fi">✓</div> Google Calendar sync — interview events</li>
+          <li><div class="fi">✓</div> Job board search (LinkedIn, Indeed, Glassdoor)</li>
+          <li><div class="fi">✓</div> Action items + follow-up tracker</li>
+          <li><div class="fi">✓</div> Pipeline export / import (JSON)</li>
+          <li><div class="fi">✓</div> Priority support</li>
+        </ul>
+        <!-- Replace href with your Stripe Payment Link -->
+        <a href="/subscribe" class="btn btn-primary" style="width:100%; justify-content:center; font-size:1rem; padding:14px;">Start Pro — $9/mo →</a>
+        <p style="font-size:.8125rem; margin-top:10px; color:var(--muted)">Cancel anytime. 7-day money-back guarantee.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Testimonials ── -->
+<section class="section" style="background:var(--bg-gray)" id="testimonials">
+  <div class="container text-center">
+    <span class="eyebrow">From job seekers</span>
+    <h2>Real results, real fast</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"I was juggling a spreadsheet, Notion, and my email at once. CloseTheOffer replaced all three. The interview prep cards alone are worth the price."</div>
+        <div class="author">
+          <div class="av">JR</div>
+          <div><div class="name">James R.</div><div class="title">AWS Solutions Architect · Landed $195K offer</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"I used Huntr before and paid $40/month. CloseTheOffer has the Gmail sync and prep cards Huntr never added — for $9. It's not even close."</div>
+        <div class="author">
+          <div class="av">KM</div>
+          <div><div class="name">Keisha M.</div><div class="title">Cloud Engineer · Interviewing at 4 companies</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <div class="quote">"The STAR story library is brilliant. I wrote my 6 stories once and now I just open prep before every interview. I went from 1 offer to 3 in the same search."</div>
+        <div class="author">
+          <div class="av">AP</div>
+          <div><div class="name">Alex P.</div><div class="title">Technical Program Manager · 3 offers in hand</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="section" id="faq">
+  <div class="container text-center">
+    <span class="eyebrow">Questions</span>
+    <h2>Everything you need to know</h2>
+    <div class="faq-list" style="text-align:left">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Do I need to set up anything to use it? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          The pipeline, prep cards, STAR stories, and action items work immediately with no setup. To connect Gmail and Google Calendar, you'll follow a one-time 5-minute setup that walks you through creating a free Google Cloud OAuth credential. Step-by-step instructions are built into the app — no technical knowledge required.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Is my data private? Do you store it on your servers? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Your job search data (pipeline, prep cards, notes) is stored in your browser's local storage and never sent to our servers. Google API calls go directly from your browser to Google — we never see your emails or calendar events. Your data belongs to you, and you can export it anytime as JSON.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          How does the job board search work? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Job search uses the JSearch API (via RapidAPI), which aggregates listings from LinkedIn, Indeed, Glassdoor, and ZipRecruiter in real-time. Pro users get this connected automatically. You can filter by keyword, location, remote-only, and date posted — and add any listing to your pipeline with one click.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          Can I cancel anytime? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Yes — cancel anytime from your account settings. If you cancel, you keep Pro access until the end of your billing period, then revert to the free plan. We also offer a 7-day money-back guarantee, no questions asked.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What's the difference between CloseTheOffer and Huntr or Teal? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Huntr and Teal focus on resume building and application tracking. CloseTheOffer focuses on what happens <em>after</em> you apply — interview prep, Gmail sync to surface recruiter responses, calendar integration to see your upcoming interviews, and a STAR story library for behavioral questions. At $9/mo, it's also 78% cheaper than Huntr's $40/mo plan.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          What if I'm not technical? Is this hard to set up? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a">
+          Not at all. You can start using the pipeline, prep cards, and action items immediately with zero setup — just sign up and go. The Google OAuth connection (for Gmail and Calendar) requires one 5-minute setup the first time, and the app guides you through every step with screenshots.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA Band ── -->
+<section class="cta-band">
+  <div class="container">
+    <h2>Ready to land your next job?</h2>
+    <p>Join 500+ job seekers running a smarter, more organized search. Free to start — no credit card needed.</p>
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+      <!-- Replace href with your actual app signup URL -->
+      <a href="/signup" class="btn btn-lg btn-cta-primary">Start free — it takes 30 seconds</a>
+      <a href="#pricing" class="btn btn-lg btn-ghost">See pricing →</a>
+    </div>
+    <p style="font-size:.8125rem; color:rgba(255,255,255,.55); margin-top:18px; max-width:400px; margin-left:auto; margin-right:auto;">
+      No credit card. 7-day money-back on Pro. Cancel anytime.
+    </p>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">Close<span>TheOffer</span></div>
+        <p class="footer-tagline">The job search dashboard that takes you from application to offer. Pipeline tracking, interview prep, Gmail sync, and job board search — all in one place.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#compare">Compare</a></li>
+          <li><a href="/changelog">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="mailto:hello@closetheoffer.com">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CloseTheOffer. All rights reserved.</span>
+      <div>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="mailto:hello@closetheoffer.com">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(btn) {
+  const isOpen = btn.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-q.open').forEach(b => {
+    b.classList.remove('open');
+    b.nextElementSibling.classList.remove('open');
+  });
+  // Open clicked (if it wasn't already open)
+  if (!isOpen) {
+    btn.classList.add('open');
+    btn.nextElementSibling.classList.add('open');
+  }
+}
+
+// Sticky nav active link
+const sections = document.querySelectorAll('section[id], div[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(l => {
+    l.style.color = l.getAttribute('href') === '#'+current ? 'var(--purple)' : '';
+  });
+});
+</script>
+</body>
+</html>

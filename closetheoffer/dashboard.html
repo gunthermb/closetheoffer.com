@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — CloseTheOffer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.loading{text-align:center;color:#64748b}
+.loading .spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#6c5ce7;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:.9375rem;color:#64748b}
+</style>
+</head>
+<body>
+
+<!-- Auth gate: checks session then loads the real app -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>Loading your dashboard…</p>
+</div>
+
+<script>
+/*
+  DAY 2 — Wire in Supabase auth check here.
+
+  Load Supabase:
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>
+
+  const sb = supabase.createClient('YOUR_URL', 'YOUR_ANON_KEY')
+
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) {
+      window.location.href = '/login';
+      return;
+    }
+    // Check subscription tier
+    checkSubscription(data.session.user.id).then(tier => {
+      loadApp(tier); // 'free' or 'pro'
+    });
+  });
+
+  For now: loads the app directly (no auth gate).
+  Replace this block once Supabase is set up.
+*/
+
+// ── TEMPORARY: load app directly ──
+// When Supabase is wired up, replace this with the auth check above.
+(function() {
+  // Inline the full dashboard app here, or fetch it dynamically.
+  // For launch, we'll just load the public HTML tool:
+  window.location.replace('/app.html');
+})();
+</script>
+
+</body>
+</html>
