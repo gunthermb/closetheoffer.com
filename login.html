@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — CloseTheOffer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;flex-direction:column}
+nav{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:56px;display:flex;align-items:center}
+.logo{font-size:1.125rem;font-weight:900;letter-spacing:-.03em;text-decoration:none;color:#1a1a2e}
+.logo span{color:#6c5ce7}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.card{background:#fff;border-radius:16px;padding:40px;width:420px;max-width:100%;box-shadow:0 4px 24px rgba(0,0,0,.07);border:1px solid #e2e8f0}
+h1{font-size:1.5rem;font-weight:800;margin-bottom:6px;color:#1a1a2e}
+.sub{color:#64748b;font-size:.9375rem;margin-bottom:28px}
+.tabs{display:flex;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:24px}
+.tab-btn{flex:1;padding:9px;font-size:.875rem;font-weight:700;background:#fff;border:none;cursor:pointer;color:#64748b;transition:all .15s}
+.tab-btn.active{background:#6c5ce7;color:#fff}
+label{display:block;font-size:.8125rem;font-weight:700;color:#374151;margin:12px 0 5px}
+input{width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 13px;font-size:.9375rem;font-family:inherit;outline:none;transition:border .15s}
+input:focus{border-color:#6c5ce7}
+.btn{width:100%;padding:12px;font-size:.9375rem;font-weight:700;border:none;border-radius:8px;cursor:pointer;margin-top:18px;transition:all .15s}
+.btn-primary{background:#6c5ce7;color:#fff}
+.btn-primary:hover{background:#5a4bd1}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:#94a3b8;font-size:.8125rem}
+.divider::before,.divider::after{content:'';flex:1;border-top:1px solid #e2e8f0}
+.btn-google{background:#fff;color:#374151;border:1.5px solid #e2e8f0;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border-radius:8px;font-size:.9375rem;font-weight:600;cursor:pointer;transition:all .15s;width:100%}
+.btn-google:hover{border-color:#6c5ce7;background:#f8f7ff}
+.footer-note{text-align:center;margin-top:20px;font-size:.8125rem;color:#64748b}
+.footer-note a{color:#6c5ce7;font-weight:600;text-decoration:none}
+.error-msg{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 13px;font-size:.875rem;color:#dc2626;margin-top:12px;display:none}
+.success-msg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 13px;font-size:.875rem;color:#166534;margin-top:12px;display:none}
+</style>
+</head>
+<body>
+<nav><a href="/" class="logo">Close<span>TheOffer</span></a></nav>
+<div class="wrap">
+  <div class="card">
+    <h1 id="card-title">Welcome back</h1>
+    <p class="sub" id="card-sub">Sign in to your CloseTheOffer account</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setMode('signin')">Sign in</button>
+      <button class="tab-btn" onclick="setMode('signup')">Create account</button>
+    </div>
+
+    <!-- Google OAuth (wire this up in Day 2 with Supabase) -->
+    <button class="btn-google" onclick="googleSignIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="divider">or</div>
+
+    <form id="auth-form" onsubmit="handleAuth(event)">
+      <label>Email address</label>
+      <input type="email" id="inp-email" placeholder="you@example.com" required autocomplete="email">
+      <label>Password</label>
+      <input type="password" id="inp-password" placeholder="••••••••" required autocomplete="current-password" minlength="8">
+      <div class="error-msg" id="error-msg"></div>
+      <div class="success-msg" id="success-msg"></div>
+      <button type="submit" class="btn btn-primary" id="submit-btn">Sign in</button>
+    </form>
+
+    <div class="footer-note" id="footer-note">
+      Don't have an account? <a href="#" onclick="setMode('signup'); return false;">Sign up free</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────
+   WIRE THIS UP ON DAY 2:
+   Replace the stubs below with real Supabase calls.
+
+   npm install @supabase/supabase-js
+   or load from CDN:
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>
+
+   const { createClient } = supabase
+   const sb = createClient('YOUR_SUPABASE_URL', 'YOUR_ANON_KEY')
+
+   Sign in:  sb.auth.signInWithPassword({ email, password })
+   Sign up:  sb.auth.signUp({ email, password })
+   Google:   sb.auth.signInWithOAuth({ provider: 'google' })
+   Session:  sb.auth.getSession()
+───────────────────────────────────────────────────────── */
+
+let mode = 'signin';
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&m==='signin')||(i===1&&m==='signup')));
+  document.getElementById('card-title').textContent = m === 'signin' ? 'Welcome back' : 'Create your account';
+  document.getElementById('card-sub').textContent   = m === 'signin' ? 'Sign in to your CloseTheOffer account' : 'Free forever — no credit card needed';
+  document.getElementById('submit-btn').textContent = m === 'signin' ? 'Sign in' : 'Create free account';
+  document.getElementById('footer-note').innerHTML  = m === 'signin'
+    ? 'Don\'t have an account? <a href="#" onclick="setMode(\'signup\'); return false;">Sign up free</a>'
+    : 'Already have an account? <a href="#" onclick="setMode(\'signin\'); return false;">Sign in</a>';
+  clearMessages();
+  document.getElementById('inp-password').setAttribute('autocomplete', m === 'signup' ? 'new-password' : 'current-password');
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('success-msg').style.display = 'none';
+}
+function showSuccess(msg) {
+  const el = document.getElementById('success-msg');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('error-msg').style.display = 'none';
+}
+function clearMessages() {
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('success-msg').style.display = 'none';
+}
+
+async function handleAuth(e) {
+  e.preventDefault();
+  clearMessages();
+  const email    = document.getElementById('inp-email').value.trim();
+  const password = document.getElementById('inp-password').value;
+  const btn      = document.getElementById('submit-btn');
+  btn.textContent = mode === 'signin' ? 'Signing in…' : 'Creating account…';
+  btn.disabled = true;
+
+  // ── STUB: replace with Supabase call ──
+  // const { data, error } = mode === 'signin'
+  //   ? await sb.auth.signInWithPassword({ email, password })
+  //   : await sb.auth.signUp({ email, password });
+  // if (error) { showError(error.message); btn.disabled=false; btn.textContent=…; return; }
+  // if (mode==='signup') { showSuccess('Check your email to confirm your account!'); }
+  // else { window.location.href = '/dashboard'; }
+
+  // Temporary stub — remove when Supabase is wired up
+  setTimeout(() => {
+    if (mode === 'signup') {
+      showSuccess('✓ Account created! Check your email to confirm, then sign in.');
+    } else {
+      window.location.href = '/dashboard';
+    }
+    btn.disabled = false;
+    btn.textContent = mode === 'signin' ? 'Sign in' : 'Create free account';
+  }, 800);
+}
+
+async function googleSignIn() {
+  // ── STUB: replace with Supabase OAuth ──
+  // await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/dashboard' } });
+  alert('Google sign-in coming soon! Use email/password for now.');
+}
+
+// Check if already logged in → redirect to dashboard
+// ── STUB: replace with Supabase session check ──
+// sb.auth.getSession().then(({ data }) => { if (data.session) window.location.href = '/dashboard'; });
+</script>
+</body>
+</html>
