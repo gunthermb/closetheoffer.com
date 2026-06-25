@@ -3,7 +3,8 @@
   "rewrites": [
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/login",     "destination": "/login.html" },
-    { "source": "/signup",    "destination": "/login.html" }
+    { "source": "/signup",    "destination": "/login.html" },
+    { "source": "/freemode",  "destination": "/app-free.html" }
   ],
   "headers": [
     {
