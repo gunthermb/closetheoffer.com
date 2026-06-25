@@ -198,6 +198,90 @@ textarea { resize: vertical; }
 .empty-state .es-title { font-size: 15px; font-weight: 700; color: #555; margin-bottom: 6px; }
 .empty-state .es-sub { font-size: 12px; line-height: 1.6; }
 .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── Resume Scanner ── */
+.rs-score-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.rs-score-card { flex: 1; min-width: 140px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 12px; text-align: center; }
+.rs-score-num { font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.rs-score-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rs-score-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 6px; }
+.rs-score-card.score-high .rs-score-num { color: var(--green); }
+.rs-score-card.score-mid .rs-score-num { color: #f0a500; }
+.rs-score-card.score-low .rs-score-num { color: var(--red); }
+.rs-score-card.score-overall { border: 2px solid var(--purple); }
+.rs-issue { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 13px 14px; margin-bottom: 8px; border-left: 4px solid var(--border); }
+.rs-issue.critical { border-left-color: var(--red); }
+.rs-issue.important { border-left-color: #f0a500; }
+.rs-issue.minor { border-left-color: var(--blue); }
+.rs-issue.issue-done { opacity: .5; }
+.rs-issue-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.rs-badge { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.rs-badge.critical { background: #fce4ec; color: #c62828; }
+.rs-badge.important { background: #fff8e1; color: #b45309; }
+.rs-badge.minor { background: #e3f2fd; color: #1565c0; }
+.rs-badge.ats { background: var(--purple-light); color: var(--purple); }
+.rs-badge.car { background: #e8f5e9; color: #2e7d32; }
+.rs-badge.structure { background: #fce4ec; color: #880e4f; }
+.rs-badge.keywords { background: #e0f7fa; color: #006064; }
+.rs-issue-title { font-size: 13px; font-weight: 700; }
+.rs-issue-desc { font-size: 12px; color: #555; line-height: 1.6; margin-bottom: 8px; }
+.rs-example { background: #fff3cd; border: 1px solid #ffe082; border-radius: 5px; padding: 7px 10px; font-size: 12px; color: #5d4037; margin-bottom: 4px; font-style: italic; line-height: 1.5; }
+.rs-fix { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 5px; padding: 7px 10px; font-size: 12px; color: #1b5e20; margin-bottom: 4px; line-height: 1.5; }
+.rs-strengths { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+.rs-strengths-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #2e7d32; margin-bottom: 6px; }
+.rs-keywords-missing { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+.rs-issue-actions { display: flex; gap: 6px; margin-top: 8px; }
+.fw-progress { height: 6px; background: var(--border); border-radius: 3px; margin: 12px 0 18px; overflow: hidden; }
+.fw-progress-bar { height: 100%; background: var(--purple); border-radius: 3px; transition: width .35s; }
+.fw-before { background: #fff3cd; border: 1px solid #ffe082; border-radius: 6px; padding: 11px 13px; font-size: 13px; color: #5d4037; margin-bottom: 8px; line-height: 1.65; }
+.fw-after { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 6px; padding: 11px 13px; font-size: 13px; color: #1b5e20; line-height: 1.65; }
+.fw-done-badge { display: inline-block; font-size: 10px; font-weight: 800; background: #e8f5e9; color: #2e7d32; border-radius: 4px; padding: 2px 7px; margin-left: 8px; vertical-align: middle; }
+.api-key-notice { background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 10px 13px; font-size: 12px; color: #7a5800; margin-bottom: 14px; }
+.rs-summary-box { background: #f5f2ff; border: 1px solid #d8d2ff; border-radius: 8px; padding: 13px 15px; font-size: 13px; color: #333; line-height: 1.65; margin-bottom: 16px; }
+
+/* ── Job Title Suggester ── */
+.jt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
+.jt-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; }
+.jt-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--purple); }
+.jt-card.match-high::before { background: var(--green); }
+.jt-card.match-mid::before { background: #f0a500; }
+.jt-card.match-low::before { background: var(--blue); }
+.jt-title { font-size: 15px; font-weight: 800; margin-bottom: 3px; color: var(--text); }
+.jt-level { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--purple); margin-bottom: 10px; }
+.jt-pay { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+.jt-pay-range { font-size: 18px; font-weight: 900; color: var(--green); }
+.jt-pay-period { font-size: 11px; color: var(--muted); }
+.jt-pay-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.jt-pay-chip { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+.jt-pay-low  { background: #fff8e1; color: #b45309; }
+.jt-pay-mid  { background: #e8f5e9; color: #2e7d32; }
+.jt-pay-high { background: #e8eaf6; color: #3949ab; }
+.jt-why { font-size: 12px; color: #555; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
+.jt-match-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+.jt-match-fill { height: 100%; border-radius: 2px; background: var(--purple); transition: width .5s; }
+.jt-actions { display: flex; gap: 6px; margin-top: 10px; }
+.jt-location-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.jt-disclaimer { font-size: 11px; color: var(--muted); margin-top: 14px; font-style: italic; }
+
+/* ── STAR Generator ── */
+.sg-context-bar { background: var(--subtle); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; font-size: 12px; color: #444; line-height: 1.65; margin-bottom: 16px; }
+.sg-context-bar strong { color: var(--text); }
+.sg-story-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: border-color .15s; }
+.sg-story-card.selected { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple-light); }
+.sg-story-hdr { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.sg-check { width: 16px; height: 16px; accent-color: var(--purple); flex-shrink: 0; cursor: pointer; }
+.sg-lp-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; background: var(--purple-light); color: var(--purple); padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+.sg-story-title { font-size: 13px; font-weight: 700; flex: 1; }
+.sg-best-for { display: flex; gap: 4px; flex-wrap: wrap; }
+.sg-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: #eef0f5; color: #556; font-weight: 600; }
+.sg-story-body { padding: 0 14px 13px; border-top: 1px solid #f0eeff; display: none; }
+.sg-story-body.open { display: block; }
+.sg-row { display: flex; gap: 10px; margin-top: 9px; }
+.sg-key { font-size: 11px; font-weight: 800; color: #fff; background: var(--purple); border-radius: 4px; padding: 2px 6px; min-width: 24px; text-align: center; flex-shrink: 0; line-height: 1.7; }
+.sg-val { font-size: 12px; color: #333; line-height: 1.65; }
+.sg-empty { text-align: center; padding: 30px 20px; color: var(--muted); }
+.sg-loading { text-align: center; padding: 30px 0; color: var(--muted); font-size: 13px; font-style: italic; }
+.sg-save-bar { position: sticky; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 -28px -28px; }
 </style>
 </head>
 <body>
@@ -335,6 +419,7 @@ textarea { resize: vertical; }
       <div class="tab" onclick="showTab('search')">🔍 Job Search</div>
       <div class="tab" onclick="showTab('prep')">📋 Interview Prep</div>
       <div class="tab" onclick="showTab('actions')">✅ Action Items</div>
+      <div class="tab" onclick="showTab('resume')">📄 Resume Scan</div>
     </div>
 
     <!-- ── Pipeline ── -->
@@ -407,9 +492,140 @@ textarea { resize: vertical; }
       <hr class="divider">
       <div class="section-hdr" style="margin-top:4px;">
         <div class="section-title">⭐ STAR Stories</div>
-        <button class="refresh-btn" onclick="openStarModal()">+ New Story</button>
+        <div class="btn-group">
+          <button class="refresh-btn" onclick="openGenerateStarModal()" style="background:var(--purple-light);color:var(--purple);border-color:#d0caff;">✨ Generate with AI</button>
+          <button class="refresh-btn" onclick="openStarModal()">+ New Story</button>
+        </div>
       </div>
       <div id="star-list"></div>
+    </div>
+
+    <!-- ── Resume Scanner ── -->
+    <div class="tab-panel" id="panel-resume">
+
+      <!-- Input State -->
+      <div id="rs-input-section">
+        <div class="section-hdr">
+          <div class="section-title">ATS &amp; CAR Resume Scanner</div>
+          <div class="btn-group">
+            <span id="rs-api-status"></span>
+          </div>
+        </div>
+
+        <div class="api-key-notice" id="rs-key-notice" style="display:none">
+          ⚠️ <strong>No Anthropic API key set.</strong> Add your key in <a href="#" onclick="showSettings()" class="link">Settings</a> to enable AI scanning. Get a key at <a href="https://console.anthropic.com/" target="_blank" class="link">console.anthropic.com</a>.
+        </div>
+
+        <div class="two-col" style="gap:16px;align-items:flex-start;">
+          <div style="flex:2;min-width:0;">
+            <label>Paste Your Resume Text *</label>
+            <textarea id="rs-resume-text" rows="18" placeholder="Paste your full resume here as plain text…&#10;&#10;Include all sections: Summary, Work Experience, Education, Skills, etc.&#10;The more complete, the better the analysis."></textarea>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <label style="margin:0;">Job Description (optional)</label>
+              <button class="btn btn-secondary btn-sm" onclick="toggleJD()" id="rs-jd-toggle">+ Add JD</button>
+            </div>
+            <div id="rs-jd-wrap" style="display:none;">
+              <textarea id="rs-jd-text" rows="10" placeholder="Paste the target job description here for keyword gap analysis…"></textarea>
+            </div>
+            <div id="rs-jd-placeholder" style="background:var(--subtle);border:2px dashed #ddd;border-radius:8px;padding:20px;text-align:center;color:var(--muted);font-size:12px;line-height:1.65;">
+              Adding a job description enables keyword gap analysis — Claude will flag which required skills are missing from your resume.
+            </div>
+
+            <div style="margin-top:16px;background:var(--subtle);border-radius:8px;padding:14px;">
+              <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">What gets checked</div>
+              <div style="font-size:12px;color:#444;line-height:1.7;">
+                <div>📋 <strong>ATS score</strong> — structure, headers, formatting, keyword density</div>
+                <div>🎯 <strong>CAR score</strong> — Challenge · Action · Result bullet format, action verbs, quantification</div>
+                <div>🔍 <strong>Keyword gaps</strong> — skills in the JD missing from your resume</div>
+                <div>✏️ <strong>Guided fixes</strong> — walk through each issue with before/after rewrites</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-primary" onclick="analyzeResume()" id="rs-scan-btn" style="font-size:14px;padding:11px 28px;">
+              🔍 Analyze Resume
+            </button>
+            <button class="btn btn-secondary" onclick="resetScan()">Clear</button>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">Or run separately:</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <button class="btn btn-secondary" onclick="suggestJobTitles()" id="rs-titles-btn" style="font-size:13px;">
+                💼 Suggest Job Titles &amp; Pay
+              </button>
+              <select id="rs-location" style="width:180px;font-size:12px;">
+                <option value="national">National average (US)</option>
+                <option value="remote">Remote / distributed</option>
+                <option value="New York City">New York City</option>
+                <option value="San Francisco Bay Area">San Francisco Bay Area</option>
+                <option value="Washington DC">Washington DC</option>
+                <option value="Seattle">Seattle</option>
+                <option value="Austin">Austin</option>
+                <option value="Chicago">Chicago</option>
+                <option value="Boston">Boston</option>
+                <option value="Denver">Denver</option>
+                <option value="Atlanta">Atlanta</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job Title Suggestions Results -->
+      <div id="rs-titles-section" style="display:none;">
+        <hr class="divider">
+        <div class="section-hdr">
+          <div class="section-title">💼 Job Titles &amp; Pay Ranges</div>
+          <div class="btn-group">
+            <span id="rs-titles-location-badge" style="font-size:11px;color:var(--muted);"></span>
+            <button class="refresh-btn" onclick="suggestJobTitles()">↻ Re-run</button>
+            <button class="refresh-btn" onclick="document.getElementById('rs-titles-section').style.display='none'">✕ Hide</button>
+          </div>
+        </div>
+        <div id="rs-titles-content"></div>
+        <div class="jt-disclaimer">* Pay ranges are estimates based on publicly reported market data as of Claude's training cutoff and may not reflect current market conditions. Actual offers vary by company size, industry, benefits, and negotiation.</div>
+      </div>
+
+      <!-- Results State -->
+      <div id="rs-results-section" style="display:none;">
+        <div class="section-hdr" style="margin-top:4px;">
+          <div class="section-title">Scan Results</div>
+          <div class="btn-group">
+            <button class="refresh-btn" onclick="resetScan()">← Rescan</button>
+            <button class="btn btn-primary btn-sm" onclick="startFixWizard()" id="rs-fix-btn">🛠 Walk Me Through Fixes</button>
+          </div>
+        </div>
+
+        <!-- Scores -->
+        <div class="rs-score-row" id="rs-scores"></div>
+
+        <!-- Summary -->
+        <div class="rs-summary-box" id="rs-summary"></div>
+
+        <!-- Strengths -->
+        <div class="rs-strengths" id="rs-strengths-box" style="display:none;">
+          <div class="rs-strengths-title">✅ Strengths</div>
+          <div id="rs-strengths-list"></div>
+        </div>
+
+        <!-- Missing keywords -->
+        <div class="rs-keywords-missing" id="rs-keywords-box" style="display:none;">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#b45309;margin-bottom:6px;">🔑 Keywords Missing from Resume</div>
+          <div id="rs-keywords-list" style="font-size:12px;color:#555;display:flex;gap:6px;flex-wrap:wrap;"></div>
+        </div>
+
+        <!-- Issues -->
+        <div class="section-hdr" style="margin-top:8px;">
+          <div class="section-title">Issues to Fix</div>
+          <span id="rs-issue-counts" style="font-size:12px;color:var(--muted);"></span>
+        </div>
+        <div id="rs-issues-list"></div>
+      </div>
     </div>
 
     <!-- ── Action Items ── -->
@@ -569,10 +785,57 @@ textarea { resize: vertical; }
     <input id="set-client-id" placeholder="123456789-abc.apps.googleusercontent.com">
     <label>RapidAPI Key (for job search)</label>
     <input id="set-rapid-key" placeholder="Leave blank to disable job board search">
+    <label>Anthropic API Key (for Resume Scanner)</label>
+    <input type="password" id="set-anthropic-key" placeholder="sk-ant-... — stored locally, never sent to any server">
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;">Get a key at <a href="https://console.anthropic.com/" target="_blank" class="link">console.anthropic.com</a> · Used only client-side for resume analysis</div>
     <div class="modal-actions">
       <button class="btn btn-danger" onclick="clearAllData()">🗑 Clear All Data</button>
       <button class="btn btn-secondary" onclick="closeModal('settings-modal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSettings()">Save & Reconnect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STAR Story Generator Modal ── -->
+<div class="prep-modal-bg" id="gen-star-modal">
+  <div class="prep-modal" style="width:760px;max-width:98vw;max-height:92vh;overflow-y:auto;padding-bottom:0;">
+    <button class="modal-close" onclick="closeModal('gen-star-modal')">✕</button>
+    <h3 style="margin-bottom:4px;">✨ AI-Generated STAR Stories</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Review the stories below, check the ones you want, then save. Uncheck any you already have or don't need.</p>
+
+    <!-- Context summary -->
+    <div class="sg-context-bar" id="sg-context-bar"></div>
+
+    <!-- Body: loading / results / empty -->
+    <div id="sg-body"><div class="sg-loading">⏳ Generating stories…</div></div>
+
+    <!-- Sticky save bar -->
+    <div class="sg-save-bar" id="sg-save-bar" style="display:none;">
+      <span id="sg-selected-count" style="font-size:13px;font-weight:600;color:var(--muted);">0 selected</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="sgSelectAll()">Select all</button>
+        <button class="btn btn-primary" onclick="sgSaveSelected()" id="sg-save-btn" disabled>Save Selected</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Resume Fix Wizard Modal ── -->
+<div class="prep-modal-bg" id="fix-wizard-modal">
+  <div class="prep-modal" style="width:740px;max-width:98vw;max-height:92vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeFixWizard()">✕</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <span id="fw-counter" style="font-size:12px;font-weight:700;color:var(--muted);">Issue 1 of 1</span>
+      <span id="fw-fixed-count" style="font-size:12px;color:var(--green);font-weight:700;"></span>
+    </div>
+    <div class="fw-progress"><div class="fw-progress-bar" id="fw-progress-bar" style="width:0%"></div></div>
+    <div id="fw-content"></div>
+    <div style="display:flex;gap:8px;margin-top:22px;justify-content:space-between;align-items:center;">
+      <button class="btn btn-secondary btn-sm" onclick="closeFixWizard()">← Back to results</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="fwSkip()">Skip →</button>
+        <button class="btn btn-primary" onclick="fwMarkFixed()">✓ Got it — Next</button>
+      </div>
     </div>
   </div>
 </div>
@@ -676,6 +939,7 @@ function initApp() {
   renderPrepCards();
   renderStarStories();
   renderTodos();
+  updateRsApiStatus();
   if (!offlineModeActive) {
     loadCalendar();
     loadGmail();
@@ -1398,15 +1662,18 @@ function deleteTodo(id) {
 function showSettings() {
   document.getElementById('set-client-id').value = CONFIG.clientId||'';
   document.getElementById('set-rapid-key').value = CONFIG.rapidApiKey||'';
+  document.getElementById('set-anthropic-key').value = CONFIG.anthropicKey||'';
   openModal('settings-modal');
 }
 
 function saveSettings() {
-  CONFIG.clientId   = document.getElementById('set-client-id').value.trim();
+  CONFIG.clientId    = document.getElementById('set-client-id').value.trim();
   CONFIG.rapidApiKey = document.getElementById('set-rapid-key').value.trim();
+  CONFIG.anthropicKey = document.getElementById('set-anthropic-key').value.trim();
   S.set('config', CONFIG);
   closeModal('settings-modal');
   initSearchBadge();
+  updateRsApiStatus();
   if (CONFIG.clientId) initGIS();
   showToast('Settings saved');
 }
@@ -1456,6 +1723,710 @@ function showToast(msg) {
   t.style.opacity = '1';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.style.opacity='0'; }, 2500);
+}
+
+// ════════════════════════════════════════════════════════════
+// RESUME SCANNER
+// ════════════════════════════════════════════════════════════
+let scanResults = null;
+let fwIssues = [];
+let fwIndex = 0;
+let fwFixed = new Set();
+
+function updateRsApiStatus() {
+  const notice = document.getElementById('rs-key-notice');
+  const badge  = document.getElementById('rs-api-status');
+  if (!notice || !badge) return;
+  if (CONFIG.anthropicKey) {
+    notice.style.display = 'none';
+    badge.innerHTML = '<span class="tag" style="background:#e8f5e9;color:#2e7d32;font-size:11px;">✓ Claude AI connected</span>';
+  } else {
+    notice.style.display = '';
+    badge.innerHTML = '<span class="tag" style="background:#fff8e1;color:#856404;font-size:11px;">⚠ No API key — <a href="#" onclick="showSettings()" style="color:var(--purple)">Add key in Settings</a></span>';
+  }
+}
+
+function toggleJD() {
+  const wrap = document.getElementById('rs-jd-wrap');
+  const ph   = document.getElementById('rs-jd-placeholder');
+  const btn  = document.getElementById('rs-jd-toggle');
+  const open = wrap.style.display === 'none';
+  wrap.style.display = open ? '' : 'none';
+  ph.style.display   = open ? 'none' : '';
+  btn.textContent    = open ? '− Hide JD' : '+ Add JD';
+}
+
+function resetScan() {
+  scanResults = null;
+  fwIssues = []; fwIndex = 0; fwFixed = new Set();
+  document.getElementById('rs-input-section').style.display = '';
+  document.getElementById('rs-results-section').style.display = 'none';
+  document.getElementById('rs-resume-text').value = '';
+  document.getElementById('rs-jd-text').value = '';
+  document.getElementById('rs-scan-btn').disabled = false;
+  document.getElementById('rs-scan-btn').textContent = '🔍 Analyze Resume';
+}
+
+async function analyzeResume() {
+  const resumeText = document.getElementById('rs-resume-text').value.trim();
+  if (!resumeText) { alert('Please paste your resume text first.'); return; }
+
+  if (!CONFIG.anthropicKey) {
+    alert('Please add your Anthropic API key in Settings first.\n\nGet one free at console.anthropic.com');
+    showSettings();
+    return;
+  }
+
+  const btn = document.getElementById('rs-scan-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+
+  const jdText = (document.getElementById('rs-jd-text').value || '').trim();
+
+  const prompt = `You are an expert resume coach and ATS (Applicant Tracking System) specialist. Analyze the following resume${jdText ? ' against the provided job description' : ''} and return a JSON object — nothing else, no markdown fences, just raw JSON.
+
+RESUME:
+"""
+${resumeText}
+"""
+${jdText ? `\nJOB DESCRIPTION:\n"""\n${jdText}\n"""` : ''}
+
+Score and analyze for:
+
+**ATS Score (0–100):** Applicant Tracking System compatibility
+- Standard section headings (Work Experience / Experience, Education, Skills, Summary/Profile)
+- No use of tables, text boxes, headers/footers, or columns (hard for ATS to parse)
+- Consistent date formats (e.g., "Jan 2022 – Mar 2024" or "2022–2024")
+- Appropriate resume length for experience level
+- Spelling and grammar
+- Keyword density and relevance to the role${jdText ? ' (compare against the job description)' : ''}
+- Contact information present
+- No personal pronouns ("I", "my")
+
+**CAR Score (0–100):** Challenge–Action–Result bullet quality
+- Each bullet starts with a strong, specific action verb (not "Responsible for", "Helped", "Assisted with", "Worked on")
+- Bullets describe a Challenge or Context, specific Actions taken, and a Result
+- Results are quantified with metrics (%, $, time saved, headcount, scale)
+- Bullets are achievement-oriented, not just job-duty descriptions
+- Appropriate bullet length (not too short/vague, not too long)
+- Each bullet tells a story of impact
+
+Return ONLY this JSON (no explanation, no markdown, no code blocks):
+{
+  "ats_score": <integer 0-100>,
+  "car_score": <integer 0-100>,
+  "overall_score": <weighted average, ats*0.45 + car*0.55>,
+  "summary": "<2-3 sentences covering the main strengths and the top priorities to improve>",
+  "strengths": ["<strength>", "<strength>"],
+  "missing_keywords": ["<keyword from JD not found in resume>"],
+  "issues": [
+    {
+      "id": "i1",
+      "category": "<ats|car|structure|keywords>",
+      "severity": "<critical|important|minor>",
+      "title": "<short title, max 8 words>",
+      "description": "<1-2 sentences: what is wrong and why it hurts>",
+      "examples": ["<verbatim problematic text from the resume, or empty array>"],
+      "fixes": ["<specific rewrite or fix suggestion>"],
+      "section": "<section name, e.g. Work Experience>"
+    }
+  ]
+}
+
+Sort issues: critical first, then important, then minor. Max 15 issues. Be specific — reference actual text from the resume. For CAR issues, always include the original bullet in examples[] and a rewritten version with metrics in fixes[].`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': CONFIG.anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const raw  = data.content?.[0]?.text || '';
+
+    let parsed;
+    try {
+      // Strip any accidental markdown fences
+      const clean = raw.replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      throw new Error('Could not parse Claude response. Try again.');
+    }
+
+    scanResults = parsed;
+    fwIssues   = (parsed.issues || []);
+    fwIndex    = 0;
+    fwFixed    = new Set();
+
+    renderScanResults(parsed);
+    document.getElementById('rs-input-section').style.display = 'none';
+    document.getElementById('rs-results-section').style.display = '';
+
+  } catch (e) {
+    alert('Scan failed: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze Resume';
+  }
+}
+
+function scoreClass(n) {
+  if (n >= 75) return 'score-high';
+  if (n >= 50) return 'score-mid';
+  return 'score-low';
+}
+
+function renderScanResults(data) {
+  // Scores
+  const scoresEl = document.getElementById('rs-scores');
+  scoresEl.innerHTML = `
+    <div class="rs-score-card ${scoreClass(data.overall_score)} score-overall">
+      <div class="rs-score-num">${data.overall_score}</div>
+      <div class="rs-score-sub">/100</div>
+      <div class="rs-score-label">Overall Score</div>
+    </div>
+    <div class="rs-score-card ${scoreClass(data.ats_score)}">
+      <div class="rs-score-num">${data.ats_score}</div>
+      <div class="rs-score-sub">/100</div>
+      <div class="rs-score-label">ATS Score</div>
+    </div>
+    <div class="rs-score-card ${scoreClass(data.car_score)}">
+      <div class="rs-score-num">${data.car_score}</div>
+      <div class="rs-score-sub">/100</div>
+      <div class="rs-score-label">CAR Score</div>
+    </div>
+  `;
+
+  // Summary
+  document.getElementById('rs-summary').textContent = data.summary || '';
+
+  // Strengths
+  const strengthsBox = document.getElementById('rs-strengths-box');
+  if (data.strengths && data.strengths.length) {
+    strengthsBox.style.display = '';
+    document.getElementById('rs-strengths-list').innerHTML =
+      data.strengths.map(s => `<div style="font-size:12px;color:#2e7d32;margin-bottom:4px;">✓ ${esc(s)}</div>`).join('');
+  } else {
+    strengthsBox.style.display = 'none';
+  }
+
+  // Missing keywords
+  const kwBox = document.getElementById('rs-keywords-box');
+  if (data.missing_keywords && data.missing_keywords.length) {
+    kwBox.style.display = '';
+    document.getElementById('rs-keywords-list').innerHTML =
+      data.missing_keywords.map(k => `<span class="tag" style="background:#fff8e1;color:#b45309;border:1px solid #ffe082;">${esc(k)}</span>`).join('');
+  } else {
+    kwBox.style.display = 'none';
+  }
+
+  // Issue count badge
+  const issues = data.issues || [];
+  const crit = issues.filter(i=>i.severity==='critical').length;
+  const imp  = issues.filter(i=>i.severity==='important').length;
+  const min  = issues.filter(i=>i.severity==='minor').length;
+  document.getElementById('rs-issue-counts').innerHTML =
+    `<span style="color:var(--red);font-weight:700;">${crit} critical</span> · <span style="color:#b45309;font-weight:700;">${imp} important</span> · <span style="color:var(--blue);font-weight:700;">${min} minor</span>`;
+
+  // Fix button visibility
+  document.getElementById('rs-fix-btn').style.display = issues.length ? '' : 'none';
+
+  // Issues list
+  renderIssuesList(issues);
+}
+
+function renderIssuesList(issues) {
+  const el = document.getElementById('rs-issues-list');
+  if (!issues.length) {
+    el.innerHTML = '<div class="no-items">No issues found — your resume looks great!</div>';
+    return;
+  }
+  const catLabels = { ats:'ATS', car:'CAR', structure:'Structure', keywords:'Keywords' };
+  el.innerHTML = '';
+  issues.forEach((issue, idx) => {
+    const done = fwFixed.has(issue.id);
+    const div  = document.createElement('div');
+    div.className = `rs-issue ${issue.severity}${done?' issue-done':''}`;
+    div.id = `issue-${issue.id}`;
+    div.innerHTML = `
+      <div class="rs-issue-hdr">
+        <span class="rs-badge ${issue.severity}">${issue.severity}</span>
+        <span class="rs-badge ${issue.category}">${catLabels[issue.category]||issue.category}</span>
+        ${issue.section ? `<span style="font-size:11px;color:var(--muted);">${esc(issue.section)}</span>` : ''}
+        ${done ? '<span style="font-size:10px;font-weight:800;background:#e8f5e9;color:#2e7d32;border-radius:4px;padding:2px 7px;">✓ Fixed</span>' : ''}
+        <span class="rs-issue-title" style="margin-left:auto;">${esc(issue.title)}</span>
+      </div>
+      <div class="rs-issue-desc">${esc(issue.description)}</div>
+      ${(issue.examples||[]).slice(0,2).map(e=>`<div class="rs-example">❌ ${esc(e)}</div>`).join('')}
+      ${(issue.fixes||[]).slice(0,2).map(f=>`<div class="rs-fix">✅ ${esc(f)}</div>`).join('')}
+      <div class="rs-issue-actions">
+        ${!done ? `<button class="btn btn-green btn-sm" onclick="markIssueFixed('${issue.id}')">✓ Mark fixed</button>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="jumpToFwIssue(${idx})">🛠 Fix in wizard</button>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function markIssueFixed(id) {
+  fwFixed.add(id);
+  renderIssuesList(fwIssues);
+  showToast('Marked as fixed ✓');
+}
+
+// ── Fix Wizard ──
+function startFixWizard() {
+  if (!fwIssues.length) return;
+  fwIndex = 0;
+  showFwStep(0);
+  document.getElementById('fix-wizard-modal').classList.add('open');
+}
+
+function jumpToFwIssue(idx) {
+  fwIndex = idx;
+  showFwStep(idx);
+  document.getElementById('fix-wizard-modal').classList.add('open');
+}
+
+function showFwStep(index) {
+  const issues = fwIssues;
+  if (index >= issues.length) { showFwComplete(); return; }
+  fwIndex = index;
+
+  document.getElementById('fw-counter').textContent = `Issue ${index + 1} of ${issues.length}`;
+  document.getElementById('fw-fixed-count').textContent = fwFixed.size ? `✓ ${fwFixed.size} fixed` : '';
+  document.getElementById('fw-progress-bar').style.width = `${(index / issues.length) * 100}%`;
+
+  const issue = issues[index];
+  const isDone = fwFixed.has(issue.id);
+  const catLabels = { ats:'ATS', car:'CAR Format', structure:'Structure', keywords:'Keywords' };
+
+  document.getElementById('fw-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <span class="rs-badge ${issue.severity}">${issue.severity}</span>
+      <span class="rs-badge ${issue.category}">${catLabels[issue.category]||issue.category}</span>
+      ${issue.section ? `<span style="font-size:11px;color:var(--muted);">${esc(issue.section)}</span>` : ''}
+      ${isDone ? '<span class="fw-done-badge">✓ Already marked fixed</span>' : ''}
+    </div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:10px;line-height:1.3;">${esc(issue.title)}</div>
+    <p style="font-size:13px;color:#444;line-height:1.7;margin-bottom:18px;">${esc(issue.description)}</p>
+    ${issue.examples && issue.examples.length ? `
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#c62828;margin-bottom:6px;">❌ Problematic text (from your resume)</div>
+      ${issue.examples.map(e=>`<div class="fw-before">${esc(e)}</div>`).join('')}
+    ` : ''}
+    ${issue.fixes && issue.fixes.length ? `
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#2e7d32;margin:14px 0 6px;">✅ Suggested rewrite</div>
+      ${issue.fixes.map(f=>`<div class="fw-after">${esc(f)}</div>`).join('')}
+    ` : ''}
+    <div class="note-box" style="margin-top:14px;">💡 Edit your resume with the suggestion above, then click <strong>Got it — Next</strong> to continue.</div>
+  `;
+}
+
+function showFwComplete() {
+  document.getElementById('fw-counter').textContent = 'All done!';
+  document.getElementById('fw-progress-bar').style.width = '100%';
+  document.getElementById('fw-fixed-count').textContent = `✓ ${fwFixed.size} of ${fwIssues.length} fixed`;
+  document.getElementById('fw-content').innerHTML = `
+    <div style="text-align:center;padding:30px 0;">
+      <div style="font-size:52px;margin-bottom:14px;">🎉</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;">You've reviewed all ${fwIssues.length} issues</div>
+      <p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:20px;">
+        ${fwFixed.size} marked as fixed. Paste your updated resume and run another scan to see your improved score.
+      </p>
+      <button class="btn btn-primary" onclick="closeFixWizard();resetScan();" style="font-size:14px;padding:11px 28px;">🔍 Scan Updated Resume</button>
+    </div>
+  `;
+}
+
+function fwMarkFixed() {
+  const issue = fwIssues[fwIndex];
+  if (issue) { fwFixed.add(issue.id); renderIssuesList(fwIssues); }
+  showFwStep(fwIndex + 1);
+}
+
+function fwSkip() {
+  showFwStep(fwIndex + 1);
+}
+
+function closeFixWizard() {
+  document.getElementById('fix-wizard-modal').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════════════════
+// STAR STORY GENERATOR
+// ════════════════════════════════════════════════════════════
+let sgGeneratedStories = []; // [{lp, title, s, t, a, r, best_for}]
+
+function openGenerateStarModal() {
+  if (!CONFIG.anthropicKey) {
+    alert('Please add your Anthropic API key in Settings first.\n\nGet one free at console.anthropic.com');
+    showSettings();
+    return;
+  }
+
+  // Gather interview context
+  const interviewRoles = [
+    ...prepCards.map(c => ({ company: c.company, role: c.role, keywords: c.keywords || [], points: c.points || [] })),
+    ...pipeline.filter(c => c.stage >= 2 && c.stage <= 4).map(c => ({ company: c.company, role: c.role, keywords: [], points: [] })),
+  ];
+
+  // Deduplicate by company+role
+  const seen = new Set();
+  const uniqueRoles = interviewRoles.filter(r => {
+    const key = r.company + '|' + r.role;
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  const existingLPs = starStories.map(s => s.lp);
+  const resumeSnippet = (document.getElementById('rs-resume-text')?.value || '').trim().slice(0, 2000);
+
+  // Build context bar
+  const ctxEl = document.getElementById('sg-context-bar');
+  if (uniqueRoles.length) {
+    ctxEl.innerHTML = `<strong>Prepping for:</strong> ` +
+      uniqueRoles.map(r => `${esc(r.company)} — ${esc(r.role)}`).join(' · ') +
+      (existingLPs.length ? `<br><strong>Existing themes:</strong> ${existingLPs.map(esc).join(', ')}` : '') +
+      (resumeSnippet ? '<br><span style="color:var(--green)">✓ Resume text included for context</span>' : '<br><span style="color:var(--muted)">Tip: paste your resume in the Resume Scan tab for richer stories</span>');
+  } else {
+    ctxEl.innerHTML = '<strong>No interviews found in pipeline or prep cards.</strong> Add prep cards or move pipeline cards to Screening/Interview stage — or generate general STAR stories anyway.';
+  }
+
+  // Reset UI
+  document.getElementById('sg-body').innerHTML = '<div class="sg-loading">⏳ Generating stories with Claude…</div>';
+  document.getElementById('sg-save-bar').style.display = 'none';
+  sgGeneratedStories = [];
+  openModal('gen-star-modal');
+
+  // Fire the API call
+  generateStarStoriesAI(uniqueRoles, existingLPs, resumeSnippet);
+}
+
+async function generateStarStoriesAI(roles, existingLPs, resumeSnippet) {
+  const rolesText = roles.length
+    ? roles.map(r => `- ${r.company} | ${r.role}${r.keywords.length ? ' | Keywords: ' + r.keywords.join(', ') : ''}${r.points.length ? ' | Talking points: ' + r.points.slice(0,3).join('; ') : ''}`).join('\n')
+    : '(No specific companies — generate general professional STAR stories)';
+
+  const avoidLPs = existingLPs.length
+    ? `\nThe candidate already has stories for these themes — prefer different ones, but overlap is OK if the story angle is distinct:\n${existingLPs.join(', ')}`
+    : '';
+
+  const resumeSection = resumeSnippet
+    ? `\nCANDIDATE RESUME EXCERPT (use to make stories specific and plausible):\n"""\n${resumeSnippet}\n"""`
+    : '';
+
+  const prompt = `You are an expert interview coach specializing in behavioral interviews and the STAR method (Situation, Task, Action, Result).
+
+The candidate is preparing for these interviews:
+${rolesText}
+${avoidLPs}
+${resumeSection}
+
+Generate 7 strong STAR format interview stories tailored to these roles. Cover a diverse range of competency themes — such as: Deliver Results, Ownership, Customer Obsession, Invent & Simplify, Bias for Action, Earn Trust, Think Big, Have Backbone, Dive Deep, Hire & Develop, Conflict Resolution, Cross-functional Collaboration, Technical Leadership, Problem Solving, Crisis Management.
+
+Requirements for each story:
+- Situation: specific, sets real context and stakes (1-2 sentences)
+- Task: candidate's specific responsibility or goal (1 sentence)
+- Action: 2-4 concrete steps the candidate took, using "I" not "we" (2-3 sentences)
+- Result: quantified outcome with numbers, % improvement, time saved, revenue, or scale (1-2 sentences)
+- Stories should feel genuine and draw from the resume context if provided
+- Avoid generic filler — be specific about technologies, team sizes, dollar amounts, timelines
+
+Return ONLY this JSON (no markdown, no explanation):
+{
+  "stories": [
+    {
+      "lp": "<Leadership Principle or Competency Theme>",
+      "title": "<6-10 word descriptive title>",
+      "situation": "<situation text>",
+      "task": "<task text>",
+      "action": "<action text>",
+      "result": "<result text with metrics>",
+      "best_for": ["<type of question this answers, e.g. 'Tell me about a time you failed', 'Describe leading a team'>"]
+    }
+  ]
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': CONFIG.anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data  = await resp.json();
+    const raw   = data.content?.[0]?.text || '';
+    const clean = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    const parsed = JSON.parse(clean);
+
+    sgGeneratedStories = (parsed.stories || []);
+    renderSgStories(sgGeneratedStories);
+
+  } catch (e) {
+    document.getElementById('sg-body').innerHTML =
+      `<div class="sg-empty" style="color:var(--red);">Generation failed: ${esc(e.message)}<br><button class="btn btn-secondary mt" onclick="openGenerateStarModal()">Try again</button></div>`;
+  }
+}
+
+function renderSgStories(stories) {
+  const body = document.getElementById('sg-body');
+  if (!stories.length) {
+    body.innerHTML = '<div class="sg-empty">No stories generated. Try again.</div>';
+    return;
+  }
+
+  body.innerHTML = stories.map((s, i) => `
+    <div class="sg-story-card selected" id="sg-card-${i}">
+      <div class="sg-story-hdr" onclick="sgToggleExpand(${i})">
+        <input type="checkbox" class="sg-check" id="sg-cb-${i}" checked onclick="event.stopPropagation();sgToggleSelect(${i})" title="Include this story">
+        <span class="sg-lp-tag">${esc(s.lp)}</span>
+        <span class="sg-story-title">${esc(s.title)}</span>
+        <div class="sg-best-for">
+          ${(s.best_for||[]).map(t=>`<span class="sg-tag">${esc(t)}</span>`).join('')}
+        </div>
+        <span style="font-size:11px;color:#bbb;flex-shrink:0;">▼</span>
+      </div>
+      <div class="sg-story-body open" id="sg-body-${i}">
+        <div class="sg-row"><span class="sg-key">S</span><span class="sg-val">${esc(s.situation||'')}</span></div>
+        <div class="sg-row"><span class="sg-key">T</span><span class="sg-val">${esc(s.task||'')}</span></div>
+        <div class="sg-row"><span class="sg-key">A</span><span class="sg-val">${esc(s.action||'')}</span></div>
+        <div class="sg-row"><span class="sg-key">R</span><span class="sg-val">${esc(s.result||'')}</span></div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('sg-save-bar').style.display = '';
+  sgUpdateCount();
+}
+
+function sgToggleExpand(i) {
+  const body  = document.getElementById(`sg-body-${i}`);
+  const open  = body.classList.toggle('open');
+  const hdr   = document.querySelector(`#sg-card-${i} .sg-story-hdr span:last-child`);
+  if (hdr) hdr.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function sgToggleSelect(i) {
+  const cb   = document.getElementById(`sg-cb-${i}`);
+  const card = document.getElementById(`sg-card-${i}`);
+  card.classList.toggle('selected', cb.checked);
+  sgUpdateCount();
+}
+
+function sgSelectAll() {
+  sgGeneratedStories.forEach((_, i) => {
+    const cb = document.getElementById(`sg-cb-${i}`);
+    if (cb) { cb.checked = true; document.getElementById(`sg-card-${i}`).classList.add('selected'); }
+  });
+  sgUpdateCount();
+}
+
+function sgUpdateCount() {
+  const checked = sgGeneratedStories.filter((_, i) => document.getElementById(`sg-cb-${i}`)?.checked).length;
+  const btn = document.getElementById('sg-save-btn');
+  document.getElementById('sg-selected-count').textContent = `${checked} of ${sgGeneratedStories.length} selected`;
+  btn.disabled = checked === 0;
+  btn.textContent = checked ? `Save ${checked} Stor${checked === 1 ? 'y' : 'ies'}` : 'Save Selected';
+}
+
+function sgSaveSelected() {
+  let saved = 0;
+  sgGeneratedStories.forEach((s, i) => {
+    if (!document.getElementById(`sg-cb-${i}`)?.checked) return;
+    starStories.push({
+      id:    's-' + Date.now() + '-' + i,
+      lp:    s.lp || 'General',
+      title: s.title || 'Story',
+      s:     s.situation || '',
+      t:     s.task      || '',
+      a:     s.action    || '',
+      r:     s.result    || '',
+    });
+    saved++;
+  });
+  S.set('stars', starStories);
+  renderStarStories();
+  closeModal('gen-star-modal');
+  showTab('prep');
+  showToast(`✓ ${saved} STAR stor${saved === 1 ? 'y' : 'ies'} saved`);
+}
+
+// ════════════════════════════════════════════════════════════
+// JOB TITLE & PAY SUGGESTER
+// ════════════════════════════════════════════════════════════
+async function suggestJobTitles() {
+  const resumeText = document.getElementById('rs-resume-text').value.trim();
+  if (!resumeText) { alert('Paste your resume text first, then click this button.'); return; }
+
+  if (!CONFIG.anthropicKey) {
+    alert('Please add your Anthropic API key in Settings first.\n\nGet one free at console.anthropic.com');
+    showSettings();
+    return;
+  }
+
+  const location = document.getElementById('rs-location').value;
+  const btn = document.getElementById('rs-titles-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+
+  const locationLabel = location === 'national' ? 'US national average' : location === 'remote' ? 'remote / distributed US roles' : location;
+
+  const prompt = `You are a career coach and compensation specialist with deep knowledge of the US job market. Analyze this resume and return ONLY a JSON object — no markdown, no explanation, just raw JSON.
+
+RESUME:
+"""
+${resumeText}
+"""
+
+LOCATION CONTEXT: ${locationLabel}
+
+Based on the candidate's actual experience, skills, seniority indicators, and industry, suggest 6–8 job titles they are well-positioned for. Include a mix: their current obvious next step, lateral moves, and 1-2 stretch roles.
+
+For each title provide realistic salary ranges for ${locationLabel} based on publicly reported market data (Bureau of Labor Statistics, Levels.fyi, LinkedIn Salary, Glassdoor, Payscale).
+
+Return ONLY this JSON:
+{
+  "candidate_summary": "<1 sentence: years of experience, domain, seniority level you inferred>",
+  "titles": [
+    {
+      "title": "<job title>",
+      "level": "<e.g. Senior, Director, Principal, Entry-Level, Mid-Level>",
+      "match": <integer 60-99 — how well resume positions them for this role>,
+      "pay_low": <annual USD integer, e.g. 95000>,
+      "pay_mid": <annual USD integer>,
+      "pay_high": <annual USD integer — top 25% / senior end>,
+      "pay_notes": "<any relevant notes: equity, bonus typical, contract vs FTE, etc.>",
+      "why": "<2 sentences: which resume strengths make them a fit, and any gaps to address>",
+      "search_tips": "<1 sentence: best keywords or boards to find these roles>"
+    }
+  ]
+}
+
+Sort by match score descending. Be specific — reference actual skills, tools, or experiences from the resume. Salary ranges should reflect ${locationLabel} market rates.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': CONFIG.anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const raw  = data.content?.[0]?.text || '';
+    let parsed;
+    try {
+      const clean = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      throw new Error('Could not parse response. Try again.');
+    }
+
+    renderJobTitles(parsed, locationLabel);
+
+  } catch (e) {
+    alert('Failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💼 Suggest Job Titles & Pay';
+  }
+}
+
+function fmtPay(n) {
+  if (!n) return '—';
+  return '$' + (n >= 1000 ? Math.round(n / 1000) + 'K' : n.toLocaleString());
+}
+
+function renderJobTitles(data, locationLabel) {
+  const section  = document.getElementById('rs-titles-section');
+  const content  = document.getElementById('rs-titles-content');
+  const badge    = document.getElementById('rs-titles-location-badge');
+
+  badge.textContent = '📍 ' + locationLabel;
+  section.style.display = '';
+
+  // Scroll to it
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  let html = '';
+
+  if (data.candidate_summary) {
+    html += `<div class="rs-summary-box" style="margin-bottom:16px;">👤 ${esc(data.candidate_summary)}</div>`;
+  }
+
+  html += '<div class="jt-grid">';
+  (data.titles || []).forEach(t => {
+    const matchClass = t.match >= 85 ? 'match-high' : t.match >= 70 ? 'match-mid' : 'match-low';
+    const matchLabel = t.match >= 85 ? '🟢 Strong match' : t.match >= 70 ? '🟡 Good match' : '🔵 Stretch role';
+    html += `
+      <div class="jt-card ${matchClass}">
+        <div class="jt-title">${esc(t.title)}</div>
+        <div class="jt-level">${esc(t.level)}</div>
+        <div class="jt-match-bar"><div class="jt-match-fill" style="width:${t.match||75}%;background:${t.match>=85?'var(--green)':t.match>=70?'#f0a500':'var(--blue)'}"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${matchLabel} · ${t.match}% fit</div>
+        <div class="jt-pay-row">
+          <span class="jt-pay-chip jt-pay-low">Floor ${fmtPay(t.pay_low)}</span>
+          <span class="jt-pay-chip jt-pay-mid">Median ${fmtPay(t.pay_mid)}</span>
+          <span class="jt-pay-chip jt-pay-high">Top ${fmtPay(t.pay_high)}</span>
+        </div>
+        ${t.pay_notes ? `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">ℹ️ ${esc(t.pay_notes)}</div>` : ''}
+        <div class="jt-why">${esc(t.why)}</div>
+        ${t.search_tips ? `<div style="font-size:11px;color:var(--purple);margin-top:8px;font-weight:600;">🔍 ${esc(t.search_tips)}</div>` : ''}
+        <div class="jt-actions">
+          <button class="btn btn-secondary btn-sm" onclick="addJobSearchFromTitle('${esc(t.title)}')">+ Add to Pipeline</button>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+
+  content.innerHTML = html;
+}
+
+function addJobSearchFromTitle(title) {
+  // Pre-fill job search with the suggested title
+  showTab('search');
+  const qEl = document.getElementById('job-query');
+  if (qEl) { qEl.value = title; qEl.focus(); }
+  showToast(`Searching for "${title}" — hit Search!`);
 }
 
 // ════════════════════════════════════════════════════════════
