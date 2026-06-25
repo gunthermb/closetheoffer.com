@@ -48,9 +48,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 // ── TEMPORARY: load app directly ──
 // When Supabase is wired up, replace this with the auth check above.
 (function() {
-  // Inline the full dashboard app here, or fetch it dynamically.
-  // For launch, we'll just load the public HTML tool:
-  window.location.replace('/app.html');
+  const path = window.location.pathname;
+  const isFreeMode = path.endsWith('/freemode') || path.endsWith('/freemode/');
+  window.location.replace(isFreeMode ? '/app-free.html' : '/app.html');
 })();
 </script>
 
