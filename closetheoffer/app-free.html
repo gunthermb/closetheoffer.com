@@ -840,10 +840,12 @@ textarea { resize: vertical; }
 // ════════════════════════════════════════════════════════════
 // CONFIG & STORAGE
 // ════════════════════════════════════════════════════════════
+const USERNAME = (window.location.pathname.split('/').filter(Boolean)[0] || 'default').toLowerCase().replace(/[^a-z0-9_-]/g,'');
+const NS = 'jsd-' + (USERNAME || 'default') + '-';
 const S = {
-  get: k => { try { return JSON.parse(localStorage.getItem('jsd-'+k)) } catch { return null } },
-  set: (k,v) => localStorage.setItem('jsd-'+k, JSON.stringify(v)),
-  del: k => localStorage.removeItem('jsd-'+k),
+  get: k => { try { return JSON.parse(localStorage.getItem(NS+k)) } catch { return null } },
+  set: (k,v) => localStorage.setItem(NS+k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(NS+k),
 };
 
 let CONFIG = S.get('config') || {};

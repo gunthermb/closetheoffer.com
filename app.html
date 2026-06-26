@@ -404,7 +404,7 @@ textarea { resize: vertical; }
 <!-- ╚══════════════════════════════════════╝ -->
 <div id="screen-app" class="screen">
   <header>
-    <h1>📋 Job Search Dashboard</h1>
+    <h1>📋 Job Search Dashboard <span id="username-display" style="font-size:13px;font-weight:400;opacity:.6;margin-left:6px;"></span></h1>
     <div class="header-user">
       <span id="user-email-display"></span>
       <div class="avatar" id="user-avatar">?</div>
@@ -844,10 +844,12 @@ textarea { resize: vertical; }
 // ════════════════════════════════════════════════════════════
 // CONFIG & STORAGE
 // ════════════════════════════════════════════════════════════
+const USERNAME = (window.location.pathname.split('/').filter(Boolean)[0] || 'default').toLowerCase().replace(/[^a-z0-9_-]/g,'');
+const NS = 'jsd-' + (USERNAME || 'default') + '-';
 const S = {
-  get: k => { try { return JSON.parse(localStorage.getItem('jsd-'+k)) } catch { return null } },
-  set: (k,v) => localStorage.setItem('jsd-'+k, JSON.stringify(v)),
-  del: k => localStorage.removeItem('jsd-'+k),
+  get: k => { try { return JSON.parse(localStorage.getItem(NS+k)) } catch { return null } },
+  set: (k,v) => localStorage.setItem(NS+k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(NS+k),
 };
 
 let CONFIG = S.get('config') || {};
@@ -954,6 +956,8 @@ function initApp() {
 function updateUserDisplay() {
   const el = document.getElementById('user-email-display');
   const av = document.getElementById('user-avatar');
+  const ud = document.getElementById('username-display');
+  if (ud && USERNAME && USERNAME !== 'default') ud.textContent = '/ ' + USERNAME;
   if (userEmail) {
     el.textContent = userEmail;
     av.textContent = userEmail[0].toUpperCase();
