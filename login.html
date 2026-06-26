@@ -75,11 +75,11 @@ input:focus{border-color:#6c5ce7}
 </div>
 
 <script>
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+// const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+// const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// const { createClient } = supabase;
+// const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let mode = 'signin';
 
@@ -121,41 +121,30 @@ async function handleAuth(e) {
   btn.textContent = mode === 'signin' ? 'Signing in…' : 'Creating account…';
   btn.disabled = true;
 
-  const { data, error } = mode === 'signin'
-    ? await sb.auth.signInWithPassword({ email, password })
-    : await sb.auth.signUp({ email, password });
-
-  if (error) {
-    showError(error.message);
-    btn.disabled = false;
-    btn.textContent = mode === 'signin' ? 'Sign in' : 'Create free account';
-    return;
-  }
-
-  if (mode === 'signup') {
-    showSuccess('✓ Account created! Check your email to confirm your account, then sign in.');
-    btn.disabled = false;
-    btn.textContent = 'Create free account';
-  } else {
-    window.location.href = '/dashboard';
-  }
+  // Mocked Auth for local development without Supabase backend
+  setTimeout(() => {
+    if (mode === 'signup') {
+      showSuccess('✓ Account created! You can now sign in.');
+      btn.disabled = false;
+      btn.textContent = 'Create free account';
+      setTimeout(() => setMode('signin'), 1500);
+    } else {
+      localStorage.setItem('mock_user', email);
+      window.location.href = '/dashboard';
+    }
+  }, 800);
 }
 
 async function googleSignIn() {
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: window.location.origin + '/dashboard'
-    }
-  });
+  // Mocked Google Auth
+  localStorage.setItem('mock_user', 'Google User');
+  window.location.href = '/dashboard';
 }
 
 // Check if already logged in → redirect to dashboard
-sb.auth.getSession().then(({ data }) => {
-  if (data.session) {
-    window.location.href = '/dashboard';
-  }
-});
+if (localStorage.getItem('mock_user')) {
+  window.location.href = '/dashboard';
+}
 </script>
 </body>
 </html>
