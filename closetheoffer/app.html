@@ -1,6 +1,6 @@
 <!--
   Created by GuntherCloudSolutions
-  Last updated: 2026-06-26 18:29:05
+  Last updated: 2026-06-26 18:39:43
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -927,15 +927,14 @@ function launchApp() {
 // APP ENTRY POINT
 // ════════════════════════════════════════════════════════════
 function init() {
-  if (!CONFIG.clientId && !CONFIG.offlineOnly) {
-    showScreen('screen-setup');
-  } else if (CONFIG.offlineOnly) {
-    offlineModeActive = true;
-    showScreen('screen-app');
-    initApp();
-  } else {
+  if (CONFIG.clientId) {
     showScreen('screen-auth');
     initGIS();
+  } else {
+    offlineModeActive = true;
+    CONFIG.offlineOnly = true;
+    showScreen('screen-app');
+    initApp();
   }
 }
 
