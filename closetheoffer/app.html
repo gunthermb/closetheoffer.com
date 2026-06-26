@@ -335,7 +335,7 @@ textarea { resize: vertical; }
           <div class="gs-body">Click <strong>Create</strong> → copy the <strong>Client ID</strong> (looks like <code>123456-abc.apps.googleusercontent.com</code>) and paste it below</div>
         </div>
         <div class="note-box">⚠️ If you see "App not verified" when signing in, click <strong>Advanced → Go to [App Name] (unsafe)</strong> — this is expected for personal apps not published to the public.</div>
-        <label>Google OAuth Client ID *</label>
+        <label for="inp-client-id">Google OAuth Client ID *</label>
         <input type="text" id="inp-client-id" placeholder="123456789-abc123.apps.googleusercontent.com" />
         <div class="gap">
           <button class="btn btn-primary" onclick="saveStep1()">Next →</button>
@@ -360,7 +360,7 @@ textarea { resize: vertical; }
           <div class="gs-num">3</div>
           <div class="gs-body">Copy your <strong>X-RapidAPI-Key</strong> from the code examples panel and paste below</div>
         </div>
-        <label>RapidAPI Key (optional)</label>
+        <label for="inp-rapid-key">RapidAPI Key (optional)</label>
         <input type="text" id="inp-rapid-key" placeholder="Leave blank to skip — use manual job entry instead" />
         <div class="note-box" style="background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20;">✓ You can skip this and still manually add jobs to your pipeline. You can always come back and add the key in Settings.</div>
         <div class="gap">
@@ -463,8 +463,8 @@ textarea { resize: vertical; }
         </div>
       </div>
       <div class="search-bar">
-        <input type="text" id="job-query" placeholder='e.g. "Cloud Architect remote" or "AWS Solutions Architect"' onkeydown="if(event.key==='Enter')searchJobs()"/>
-        <select id="job-location" style="width:160px">
+        <input type="text" id="job-query" aria-label="Job query" placeholder='e.g. "Cloud Architect remote" or "AWS Solutions Architect"' onkeydown="if(event.key==='Enter')searchJobs()"/>
+        <select id="job-location" aria-label="Job location" style="width:160px">
           <option value="">Any location</option>
           <option value="remote">Remote only</option>
           <option value="United States">United States</option>
@@ -474,7 +474,7 @@ textarea { resize: vertical; }
           <option value="Seattle">Seattle</option>
           <option value="Austin">Austin</option>
         </select>
-        <select id="job-date" style="width:130px">
+        <select id="job-date" aria-label="Date posted" style="width:130px">
           <option value="">Any time</option>
           <option value="today">Today</option>
           <option value="3days">Past 3 days</option>
@@ -522,12 +522,12 @@ textarea { resize: vertical; }
 
         <div class="two-col" style="gap:16px;align-items:flex-start;">
           <div style="flex:2;min-width:0;">
-            <label>Paste Your Resume Text *</label>
+            <label for="rs-resume-text">Paste Your Resume Text *</label>
             <textarea id="rs-resume-text" rows="18" placeholder="Paste your full resume here as plain text…&#10;&#10;Include all sections: Summary, Work Experience, Education, Skills, etc.&#10;The more complete, the better the analysis."></textarea>
           </div>
           <div style="flex:1;min-width:200px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-              <label style="margin:0;">Job Description (optional)</label>
+              <label for="rs-jd-text" style="margin:0;">Job Description (optional)</label>
               <button class="btn btn-secondary btn-sm" onclick="toggleJD()" id="rs-jd-toggle">+ Add JD</button>
             </div>
             <div id="rs-jd-wrap" style="display:none;">
@@ -562,7 +562,7 @@ textarea { resize: vertical; }
               <button class="btn btn-secondary" onclick="suggestJobTitles()" id="rs-titles-btn" style="font-size:13px;">
                 💼 Suggest Job Titles &amp; Pay
               </button>
-              <select id="rs-location" style="width:180px;font-size:12px;">
+              <select id="rs-location" aria-label="Resume location for job title suggestion" style="width:180px;font-size:12px;">
                 <option value="national">National average (US)</option>
                 <option value="remote">Remote / distributed</option>
                 <option value="New York City">New York City</option>
@@ -660,12 +660,12 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('card-modal')">✕</button>
     <h3 id="card-modal-title">Add Opportunity</h3>
     <div class="row">
-      <div><label>Company *</label><input id="cm-company" placeholder="e.g. Amazon"></div>
-      <div><label>Role *</label><input id="cm-role" placeholder="e.g. Solutions Architect"></div>
+      <div><label for="cm-company">Company *</label><input id="cm-company" placeholder="e.g. Amazon"></div>
+      <div><label for="cm-role">Role *</label><input id="cm-role" placeholder="e.g. Solutions Architect"></div>
     </div>
     <div class="row">
       <div>
-        <label>Location</label>
+        <label for="cm-loc">Location</label>
         <select id="cm-loc">
           <option value="remote">Remote</option>
           <option value="hybrid">Hybrid</option>
@@ -673,7 +673,7 @@ textarea { resize: vertical; }
         </select>
       </div>
       <div>
-        <label>Stage</label>
+        <label for="cm-stage">Stage</label>
         <select id="cm-stage">
           <option value="0">New / Reviewing</option>
           <option value="1">Applied</option>
@@ -685,13 +685,13 @@ textarea { resize: vertical; }
       </div>
     </div>
     <div class="row">
-      <div><label>Salary</label><input id="cm-salary" placeholder="e.g. $180K–$220K"></div>
+      <div><label for="cm-salary">Salary</label><input id="cm-salary" placeholder="e.g. $180K–$220K"></div>
       <div>
-        <label>Clearance required?</label>
+        <label for="cm-clearance">Clearance required?</label>
         <select id="cm-clearance"><option value="no">No</option><option value="yes">Yes (TS/SCI)</option></select>
       </div>
     </div>
-    <label>Notes / Recruiter</label>
+    <label for="cm-notes">Notes / Recruiter</label>
     <textarea id="cm-notes" rows="2" placeholder="Contact info, source, key details…"></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('card-modal')">Cancel</button>
@@ -706,24 +706,24 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('prep-edit-modal')">✕</button>
     <h3 id="prep-modal-title">New Interview Prep Card</h3>
     <div class="row">
-      <div><label>Company *</label><input id="pm-company" placeholder="e.g. Acme Corp"></div>
-      <div><label>Role *</label><input id="pm-role" placeholder="e.g. Cloud Architect"></div>
+      <div><label for="pm-company">Company *</label><input id="pm-company" placeholder="e.g. Acme Corp"></div>
+      <div><label for="pm-role">Role *</label><input id="pm-role" placeholder="e.g. Cloud Architect"></div>
     </div>
-    <label>Interview Date / Time</label>
+    <label for="pm-when">Interview Date / Time</label>
     <input id="pm-when" placeholder="e.g. Mon Jun 23 · 2:00 PM ET · Zoom">
-    <label>Contact / Recruiter</label>
+    <label for="pm-contact">Contact / Recruiter</label>
     <input id="pm-contact" placeholder="e.g. Jane Smith · jane@company.com">
-    <label>Salary Target</label>
+    <label for="pm-salary">Salary Target</label>
     <input id="pm-salary" placeholder="e.g. Target $180K — do NOT anchor low">
-    <label>Company Overview</label>
+    <label for="pm-about">Company Overview</label>
     <textarea id="pm-about" rows="2" placeholder="What does this company do? Who are their clients?"></textarea>
-    <label>Key Talking Points (one per line)</label>
+    <label for="pm-points">Key Talking Points (one per line)</label>
     <textarea id="pm-points" rows="3" placeholder="Lead with X..&#10;Emphasize Y...&#10;Mention clearance..."></textarea>
-    <label>Questions to Ask (one per line)</label>
+    <label for="pm-questions">Questions to Ask (one per line)</label>
     <textarea id="pm-questions" rows="3" placeholder="What does day 1 look like?&#10;What's the team structure?"></textarea>
-    <label>Keywords / Skills to Mention (comma-separated)</label>
+    <label for="pm-keywords">Keywords / Skills to Mention (comma-separated)</label>
     <input id="pm-keywords" placeholder="AWS, Terraform, FedRAMP, Zero Trust">
-    <label>Watch-outs / Red Flags</label>
+    <label for="pm-watch">Watch-outs / Red Flags</label>
     <textarea id="pm-watch" rows="2" placeholder="Ask about comp structure, confirm remote, check clearance timeline…"></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('prep-edit-modal')">Cancel</button>
@@ -738,16 +738,16 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('star-modal')">✕</button>
     <h3 id="star-modal-title">Add STAR Story</h3>
     <div class="row">
-      <div><label>Leadership Principle / Theme *</label><input id="sm-lp" placeholder="e.g. Deliver Results"></div>
-      <div><label>Title *</label><input id="sm-title" placeholder="e.g. 1,000-Server Migration"></div>
+      <div><label for="sm-lp">Leadership Principle / Theme *</label><input id="sm-lp" placeholder="e.g. Deliver Results"></div>
+      <div><label for="sm-title">Title *</label><input id="sm-title" placeholder="e.g. 1,000-Server Migration"></div>
     </div>
-    <label>Situation</label>
+    <label for="sm-s">Situation</label>
     <textarea id="sm-s" rows="2" placeholder="What was the context and challenge?"></textarea>
-    <label>Task</label>
+    <label for="sm-t">Task</label>
     <textarea id="sm-t" rows="2" placeholder="What were you specifically responsible for?"></textarea>
-    <label>Action</label>
+    <label for="sm-a">Action</label>
     <textarea id="sm-a" rows="3" placeholder="What did you do — specifically and technically?"></textarea>
-    <label>Result (with metrics)</label>
+    <label for="sm-r">Result (with metrics)</label>
     <textarea id="sm-r" rows="2" placeholder="What was the outcome? Include numbers."></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('star-modal')">Cancel</button>
@@ -761,9 +761,9 @@ textarea { resize: vertical; }
   <div class="modal">
     <button class="modal-close" onclick="closeModal('todo-modal')">✕</button>
     <h3>Add Action Item</h3>
-    <label>Task *</label><input id="tm-text" placeholder="e.g. Follow up with recruiter at Acme">
-    <label>Detail / Sub-task</label><input id="tm-sub" placeholder="e.g. Jane Smith · jane@acme.com">
-    <label>Priority</label>
+    <label for="tm-text">Task *</label><input id="tm-text" placeholder="e.g. Follow up with recruiter at Acme">
+    <label for="tm-sub">Detail / Sub-task</label><input id="tm-sub" placeholder="e.g. Jane Smith · jane@acme.com">
+    <label for="tm-priority">Priority</label>
     <select id="tm-priority"><option value="normal">Normal</option><option value="urgent">Urgent</option></select>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('todo-modal')">Cancel</button>
@@ -785,11 +785,11 @@ textarea { resize: vertical; }
   <div class="modal">
     <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
     <h3>⚙ Settings</h3>
-    <label>Google OAuth Client ID</label>
+    <label for="set-client-id">Google OAuth Client ID</label>
     <input id="set-client-id" placeholder="123456789-abc.apps.googleusercontent.com">
-    <label>RapidAPI Key (for job search)</label>
+    <label for="set-rapid-key">RapidAPI Key (for job search)</label>
     <input id="set-rapid-key" placeholder="Leave blank to disable job board search">
-    <label>Anthropic API Key (for Resume Scanner)</label>
+    <label for="set-anthropic-key">Anthropic API Key (for Resume Scanner)</label>
     <input type="password" id="set-anthropic-key" placeholder="sk-ant-... — stored locally, never sent to any server">
     <div style="font-size:11px;color:var(--muted);margin-top:4px;">Get a key at <a href="https://console.anthropic.com/" target="_blank" class="link">console.anthropic.com</a> · Used only client-side for resume analysis</div>
     <div class="modal-actions">
