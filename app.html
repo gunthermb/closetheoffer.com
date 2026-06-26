@@ -1,6 +1,6 @@
 <!--
   Created by GuntherCloudSolutions
-  Last updated: 2026-06-26 18:39:43
+  Last updated: 2026-06-26 18:54:39
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -293,112 +293,25 @@ textarea { resize: vertical; }
 <!-- ╔══════════════════════════════════════╗ -->
 <!-- ║         SETUP WIZARD SCREEN         ║ -->
 <!-- ╚══════════════════════════════════════╝ -->
-<div id="screen-setup" class="screen active">
-  <div class="center-wrap">
-    <div class="card-box">
-      <h2>🚀 Job Search Dashboard</h2>
-      <p class="sub">Track your applications, interviews, and job search in one place. Connects to Gmail + Google Calendar, and optionally searches LinkedIn, Indeed, and Glassdoor.</p>
-
-      <div class="wizard-steps">
-        <div class="ws active" id="ws-1">1 · Google</div>
-        <div class="ws" id="ws-2">2 · Job Boards</div>
-        <div class="ws" id="ws-3">3 · Done</div>
-      </div>
-
-      <!-- Step 1: Google OAuth -->
-      <div class="step-panel active" id="step-1">
-        <p style="font-size:13px; color:#444; line-height:1.65; margin-bottom:14px;">
-          To connect Gmail and Google Calendar, you need a <strong>free Google Cloud OAuth Client ID</strong>. This takes ~5 minutes to set up once.
-        </p>
-        <div class="guide-step">
-          <div class="gs-num">1</div>
-          <div class="gs-body">Go to <a href="https://console.cloud.google.com/" target="_blank" class="link">console.cloud.google.com</a> → Create a <strong>New Project</strong> (name it anything, e.g. "Job Dashboard")</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">2</div>
-          <div class="gs-body">In the left menu go to <code>APIs & Services → Library</code> and enable both <strong>Gmail API</strong> and <strong>Google Calendar API</strong></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">3</div>
-          <div class="gs-body">Go to <code>APIs & Services → OAuth consent screen</code> → choose <strong>External</strong> → fill in App name and your email → Save</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">4</div>
-          <div class="gs-body">Go to <code>APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID</code> → Application type: <strong>Web application</strong></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">5</div>
-          <div class="gs-body">Under <strong>Authorized JavaScript origins</strong>, add the URL where you're opening this file (e.g. <code>http://localhost</code> or your hosted URL)</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">6</div>
-          <div class="gs-body">Click <strong>Create</strong> → copy the <strong>Client ID</strong> (looks like <code>123456-abc.apps.googleusercontent.com</code>) and paste it below</div>
-        </div>
-        <div class="note-box">⚠️ If you see "App not verified" when signing in, click <strong>Advanced → Go to [App Name] (unsafe)</strong> — this is expected for personal apps not published to the public.</div>
-        <label>Google OAuth Client ID *</label>
-        <input type="text" id="inp-client-id" placeholder="123456789-abc123.apps.googleusercontent.com" />
-        <div class="gap">
-          <button class="btn btn-primary" onclick="saveStep1()">Next →</button>
-          <button class="btn btn-secondary" onclick="skipSetup()">Skip setup (offline mode)</button>
-        </div>
-      </div>
-
-      <!-- Step 2: Job Boards -->
-      <div class="step-panel" id="step-2">
-        <p style="font-size:13px; color:#444; line-height:1.65; margin-bottom:14px;">
-          To search <strong>LinkedIn, Indeed, and Glassdoor</strong> listings directly in the dashboard, enter a free <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="link">RapidAPI JSearch key</a>.
-        </p>
-        <div class="guide-step">
-          <div class="gs-num">1</div>
-          <div class="gs-body">Go to <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="link">rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch</a></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">2</div>
-          <div class="gs-body">Sign up for a free account → subscribe to the JSearch API (free tier: 200 requests/month)</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">3</div>
-          <div class="gs-body">Copy your <strong>X-RapidAPI-Key</strong> from the code examples panel and paste below</div>
-        </div>
-        <label>RapidAPI Key (optional)</label>
-        <input type="text" id="inp-rapid-key" placeholder="Leave blank to skip — use manual job entry instead" />
-        <div class="note-box" style="background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20;">✓ You can skip this and still manually add jobs to your pipeline. You can always come back and add the key in Settings.</div>
-        <div class="gap">
-          <button class="btn btn-secondary" onclick="gotoStep(1)">← Back</button>
-          <button class="btn btn-primary" onclick="saveStep2()">Next →</button>
-        </div>
-      </div>
-
-      <!-- Step 3: Done -->
-      <div class="step-panel" id="step-3">
-        <div style="text-align:center; padding: 20px 0;">
-          <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
-          <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">You're all set!</h3>
-          <p style="font-size:13px; color:#555; line-height:1.65; margin-bottom:24px;">Your credentials are saved locally in your browser. Nothing is sent to any server.</p>
-        </div>
-        <button class="btn btn-primary" style="width:100%; font-size:15px; padding:12px;" onclick="launchApp()">Open Dashboard →</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- setup screen removed — sign-in handled by screen-auth -->
 
 <!-- ╔══════════════════════════════════════╗ -->
 <!-- ║         AUTH / SIGN-IN SCREEN       ║ -->
 <!-- ╚══════════════════════════════════════╝ -->
 <div id="screen-auth" class="screen">
   <div class="center-wrap">
-    <div class="card-box" style="text-align:center;">
+    <div class="card-box" style="text-align:center; max-width:400px;">
       <div style="font-size:48px; margin-bottom:12px;">📋</div>
-      <h2>Job Search Dashboard</h2>
-      <p class="sub" style="margin-bottom:28px;">Sign in with your Google account to load your calendar and Gmail.</p>
-      <button class="btn btn-primary" style="font-size:15px; padding:12px 28px;" onclick="requestGoogleToken()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 0 1 0-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0 0 12.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
+      <h2 style="font-size:22px; margin-bottom:6px;">CloseTheOffer</h2>
+      <p class="sub" style="margin-bottom:28px;">Sign in with Google to sync your Gmail and Calendar, or continue without signing in.</p>
+      <button class="btn btn-primary" style="width:100%; font-size:15px; padding:13px 24px; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="requestGoogleToken()">
+        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 0 1 0-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0 0 12.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
         Sign in with Google
       </button>
-      <div style="margin-top:16px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSettings()">⚙ Change credentials</button>
-        <button class="btn btn-secondary btn-sm" style="margin-left:6px;" onclick="offlineMode()">Continue offline</button>
+      <div style="margin-top:12px;">
+        <button class="btn btn-secondary" style="width:100%;" onclick="offlineMode()">Continue without signing in</button>
       </div>
+      <p style="margin-top:20px; font-size:11px; color:#aab;">Your data is stored in your browser and never sent to our servers.</p>
     </div>
   </div>
 </div>
@@ -785,8 +698,6 @@ textarea { resize: vertical; }
   <div class="modal">
     <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
     <h3>⚙ Settings</h3>
-    <label>Google OAuth Client ID</label>
-    <input id="set-client-id" placeholder="123456789-abc.apps.googleusercontent.com">
     <label>RapidAPI Key (for job search)</label>
     <input id="set-rapid-key" placeholder="Leave blank to disable job board search">
     <label>Anthropic API Key (for Resume Scanner)</label>
@@ -848,6 +759,9 @@ textarea { resize: vertical; }
 // ════════════════════════════════════════════════════════════
 // CONFIG & STORAGE
 // ════════════════════════════════════════════════════════════
+// Replace with your closetheoffer.com Google OAuth Client ID
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+
 const USERNAME = (window.location.pathname.split('/').filter(Boolean)[0] || 'default').toLowerCase().replace(/[^a-z0-9_-]/g,'');
 const NS = 'jsd-' + (USERNAME || 'default') + '-';
 const S = {
@@ -876,36 +790,7 @@ let editingStarId = null;
 
 // ════════════════════════════════════════════════════════════
 // SETUP WIZARD
-// ════════════════════════════════════════════════════════════
-let currentStep = 1;
-
-function gotoStep(n) {
-  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.ws').forEach((w,i) => {
-    w.classList.remove('active','done');
-    if (i+1 < n) w.classList.add('done');
-    if (i+1 === n) w.classList.add('active');
-  });
-  document.getElementById('step-'+n).classList.add('active');
-  currentStep = n;
-}
-
-function saveStep1() {
-  const id = document.getElementById('inp-client-id').value.trim();
-  if (!id) { alert('Please enter your Google OAuth Client ID.'); return; }
-  CONFIG.clientId = id;
-  S.set('config', CONFIG);
-  gotoStep(2);
-}
-
-function saveStep2() {
-  const key = document.getElementById('inp-rapid-key').value.trim();
-  if (key) CONFIG.rapidApiKey = key;
-  S.set('config', CONFIG);
-  gotoStep(3);
-}
-
-function skipSetup() {
+function offlineMode() {
   CONFIG.offlineOnly = true;
   S.set('config', CONFIG);
   offlineModeActive = true;
@@ -913,29 +798,12 @@ function skipSetup() {
   initApp();
 }
 
-function launchApp() {
-  if (CONFIG.clientId) {
-    showScreen('screen-auth');
-    initGIS();
-  } else {
-    showScreen('screen-app');
-    initApp();
-  }
-}
-
 // ════════════════════════════════════════════════════════════
 // APP ENTRY POINT
 // ════════════════════════════════════════════════════════════
 function init() {
-  if (CONFIG.clientId) {
-    showScreen('screen-auth');
-    initGIS();
-  } else {
-    offlineModeActive = true;
-    CONFIG.offlineOnly = true;
-    showScreen('screen-app');
-    initApp();
-  }
+  showScreen('screen-auth');
+  initGIS();
 }
 
 function initApp() {
@@ -984,7 +852,7 @@ function initGIS() {
     return;
   }
   tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.clientId,
+    client_id: GOOGLE_CLIENT_ID,
     scope: [
       'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/gmail.readonly',
@@ -1667,21 +1535,18 @@ function deleteTodo(id) {
 // SETTINGS
 // ════════════════════════════════════════════════════════════
 function showSettings() {
-  document.getElementById('set-client-id').value = CONFIG.clientId||'';
   document.getElementById('set-rapid-key').value = CONFIG.rapidApiKey||'';
   document.getElementById('set-anthropic-key').value = CONFIG.anthropicKey||'';
   openModal('settings-modal');
 }
 
 function saveSettings() {
-  CONFIG.clientId    = document.getElementById('set-client-id').value.trim();
-  CONFIG.rapidApiKey = document.getElementById('set-rapid-key').value.trim();
+  CONFIG.rapidApiKey  = document.getElementById('set-rapid-key').value.trim();
   CONFIG.anthropicKey = document.getElementById('set-anthropic-key').value.trim();
   S.set('config', CONFIG);
   closeModal('settings-modal');
   initSearchBadge();
   updateRsApiStatus();
-  if (CONFIG.clientId) initGIS();
   showToast('Settings saved');
 }
 

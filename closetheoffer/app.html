@@ -1,6 +1,6 @@
 <!--
   Created by GuntherCloudSolutions
-  Last updated: 2026-06-26 18:39:43
+  Last updated: 2026-06-26 18:54:39
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -293,112 +293,25 @@ textarea { resize: vertical; }
 <!-- ╔══════════════════════════════════════╗ -->
 <!-- ║         SETUP WIZARD SCREEN         ║ -->
 <!-- ╚══════════════════════════════════════╝ -->
-<div id="screen-setup" class="screen active">
-  <div class="center-wrap">
-    <div class="card-box">
-      <h2>🚀 Job Search Dashboard</h2>
-      <p class="sub">Track your applications, interviews, and job search in one place. Connects to Gmail + Google Calendar, and optionally searches LinkedIn, Indeed, and Glassdoor.</p>
-
-      <div class="wizard-steps">
-        <div class="ws active" id="ws-1">1 · Google</div>
-        <div class="ws" id="ws-2">2 · Job Boards</div>
-        <div class="ws" id="ws-3">3 · Done</div>
-      </div>
-
-      <!-- Step 1: Google OAuth -->
-      <div class="step-panel active" id="step-1">
-        <p style="font-size:13px; color:#444; line-height:1.65; margin-bottom:14px;">
-          To connect Gmail and Google Calendar, you need a <strong>free Google Cloud OAuth Client ID</strong>. This takes ~5 minutes to set up once.
-        </p>
-        <div class="guide-step">
-          <div class="gs-num">1</div>
-          <div class="gs-body">Go to <a href="https://console.cloud.google.com/" target="_blank" class="link">console.cloud.google.com</a> → Create a <strong>New Project</strong> (name it anything, e.g. "Job Dashboard")</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">2</div>
-          <div class="gs-body">In the left menu go to <code>APIs & Services → Library</code> and enable both <strong>Gmail API</strong> and <strong>Google Calendar API</strong></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">3</div>
-          <div class="gs-body">Go to <code>APIs & Services → OAuth consent screen</code> → choose <strong>External</strong> → fill in App name and your email → Save</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">4</div>
-          <div class="gs-body">Go to <code>APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID</code> → Application type: <strong>Web application</strong></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">5</div>
-          <div class="gs-body">Under <strong>Authorized JavaScript origins</strong>, add the URL where you're opening this file (e.g. <code>http://localhost</code> or your hosted URL)</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">6</div>
-          <div class="gs-body">Click <strong>Create</strong> → copy the <strong>Client ID</strong> (looks like <code>123456-abc.apps.googleusercontent.com</code>) and paste it below</div>
-        </div>
-        <div class="note-box">⚠️ If you see "App not verified" when signing in, click <strong>Advanced → Go to [App Name] (unsafe)</strong> — this is expected for personal apps not published to the public.</div>
-        <label for="inp-client-id">Google OAuth Client ID *</label>
-        <input type="text" id="inp-client-id" placeholder="123456789-abc123.apps.googleusercontent.com" />
-        <div class="gap">
-          <button class="btn btn-primary" onclick="saveStep1()">Next →</button>
-          <button class="btn btn-secondary" onclick="skipSetup()">Skip setup (offline mode)</button>
-        </div>
-      </div>
-
-      <!-- Step 2: Job Boards -->
-      <div class="step-panel" id="step-2">
-        <p style="font-size:13px; color:#444; line-height:1.65; margin-bottom:14px;">
-          To search <strong>LinkedIn, Indeed, and Glassdoor</strong> listings directly in the dashboard, enter a free <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="link">RapidAPI JSearch key</a>.
-        </p>
-        <div class="guide-step">
-          <div class="gs-num">1</div>
-          <div class="gs-body">Go to <a href="https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch" target="_blank" class="link">rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch</a></div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">2</div>
-          <div class="gs-body">Sign up for a free account → subscribe to the JSearch API (free tier: 200 requests/month)</div>
-        </div>
-        <div class="guide-step">
-          <div class="gs-num">3</div>
-          <div class="gs-body">Copy your <strong>X-RapidAPI-Key</strong> from the code examples panel and paste below</div>
-        </div>
-        <label for="inp-rapid-key">RapidAPI Key (optional)</label>
-        <input type="text" id="inp-rapid-key" placeholder="Leave blank to skip — use manual job entry instead" />
-        <div class="note-box" style="background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20;">✓ You can skip this and still manually add jobs to your pipeline. You can always come back and add the key in Settings.</div>
-        <div class="gap">
-          <button class="btn btn-secondary" onclick="gotoStep(1)">← Back</button>
-          <button class="btn btn-primary" onclick="saveStep2()">Next →</button>
-        </div>
-      </div>
-
-      <!-- Step 3: Done -->
-      <div class="step-panel" id="step-3">
-        <div style="text-align:center; padding: 20px 0;">
-          <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
-          <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">You're all set!</h3>
-          <p style="font-size:13px; color:#555; line-height:1.65; margin-bottom:24px;">Your credentials are saved locally in your browser. Nothing is sent to any server.</p>
-        </div>
-        <button class="btn btn-primary" style="width:100%; font-size:15px; padding:12px;" onclick="launchApp()">Open Dashboard →</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- setup screen removed — sign-in handled by screen-auth -->
 
 <!-- ╔══════════════════════════════════════╗ -->
 <!-- ║         AUTH / SIGN-IN SCREEN       ║ -->
 <!-- ╚══════════════════════════════════════╝ -->
 <div id="screen-auth" class="screen">
   <div class="center-wrap">
-    <div class="card-box" style="text-align:center;">
+    <div class="card-box" style="text-align:center; max-width:400px;">
       <div style="font-size:48px; margin-bottom:12px;">📋</div>
-      <h2>Job Search Dashboard</h2>
-      <p class="sub" style="margin-bottom:28px;">Sign in with your Google account to load your calendar and Gmail.</p>
-      <button class="btn btn-primary" style="font-size:15px; padding:12px 28px;" onclick="requestGoogleToken()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 0 1 0-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0 0 12.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
+      <h2 style="font-size:22px; margin-bottom:6px;">CloseTheOffer</h2>
+      <p class="sub" style="margin-bottom:28px;">Sign in with Google to sync your Gmail and Calendar, or continue without signing in.</p>
+      <button class="btn btn-primary" style="width:100%; font-size:15px; padding:13px 24px; display:flex; align-items:center; justify-content:center; gap:10px;" onclick="requestGoogleToken()">
+        <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972a6.033 6.033 0 0 1 0-12.064c1.498 0 2.866.549 3.921 1.453l2.814-2.814A9.969 9.969 0 0 0 12.545 2C7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.748l-9.426-.013z"/></svg>
         Sign in with Google
       </button>
-      <div style="margin-top:16px;">
-        <button class="btn btn-secondary btn-sm" onclick="showSettings()">⚙ Change credentials</button>
-        <button class="btn btn-secondary btn-sm" style="margin-left:6px;" onclick="offlineMode()">Continue offline</button>
+      <div style="margin-top:12px;">
+        <button class="btn btn-secondary" style="width:100%;" onclick="offlineMode()">Continue without signing in</button>
       </div>
+      <p style="margin-top:20px; font-size:11px; color:#aab;">Your data is stored in your browser and never sent to our servers.</p>
     </div>
   </div>
 </div>
@@ -463,8 +376,8 @@ textarea { resize: vertical; }
         </div>
       </div>
       <div class="search-bar">
-        <input type="text" id="job-query" aria-label="Job query" placeholder='e.g. "Cloud Architect remote" or "AWS Solutions Architect"' onkeydown="if(event.key==='Enter')searchJobs()"/>
-        <select id="job-location" aria-label="Job location" style="width:160px">
+        <input type="text" id="job-query" placeholder='e.g. "Cloud Architect remote" or "AWS Solutions Architect"' onkeydown="if(event.key==='Enter')searchJobs()"/>
+        <select id="job-location" style="width:160px">
           <option value="">Any location</option>
           <option value="remote">Remote only</option>
           <option value="United States">United States</option>
@@ -474,7 +387,7 @@ textarea { resize: vertical; }
           <option value="Seattle">Seattle</option>
           <option value="Austin">Austin</option>
         </select>
-        <select id="job-date" aria-label="Date posted" style="width:130px">
+        <select id="job-date" style="width:130px">
           <option value="">Any time</option>
           <option value="today">Today</option>
           <option value="3days">Past 3 days</option>
@@ -522,12 +435,12 @@ textarea { resize: vertical; }
 
         <div class="two-col" style="gap:16px;align-items:flex-start;">
           <div style="flex:2;min-width:0;">
-            <label for="rs-resume-text">Paste Your Resume Text *</label>
+            <label>Paste Your Resume Text *</label>
             <textarea id="rs-resume-text" rows="18" placeholder="Paste your full resume here as plain text…&#10;&#10;Include all sections: Summary, Work Experience, Education, Skills, etc.&#10;The more complete, the better the analysis."></textarea>
           </div>
           <div style="flex:1;min-width:200px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-              <label for="rs-jd-text" style="margin:0;">Job Description (optional)</label>
+              <label style="margin:0;">Job Description (optional)</label>
               <button class="btn btn-secondary btn-sm" onclick="toggleJD()" id="rs-jd-toggle">+ Add JD</button>
             </div>
             <div id="rs-jd-wrap" style="display:none;">
@@ -562,7 +475,7 @@ textarea { resize: vertical; }
               <button class="btn btn-secondary" onclick="suggestJobTitles()" id="rs-titles-btn" style="font-size:13px;">
                 💼 Suggest Job Titles &amp; Pay
               </button>
-              <select id="rs-location" aria-label="Resume location for job title suggestion" style="width:180px;font-size:12px;">
+              <select id="rs-location" style="width:180px;font-size:12px;">
                 <option value="national">National average (US)</option>
                 <option value="remote">Remote / distributed</option>
                 <option value="New York City">New York City</option>
@@ -660,12 +573,12 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('card-modal')">✕</button>
     <h3 id="card-modal-title">Add Opportunity</h3>
     <div class="row">
-      <div><label for="cm-company">Company *</label><input id="cm-company" placeholder="e.g. Amazon"></div>
-      <div><label for="cm-role">Role *</label><input id="cm-role" placeholder="e.g. Solutions Architect"></div>
+      <div><label>Company *</label><input id="cm-company" placeholder="e.g. Amazon"></div>
+      <div><label>Role *</label><input id="cm-role" placeholder="e.g. Solutions Architect"></div>
     </div>
     <div class="row">
       <div>
-        <label for="cm-loc">Location</label>
+        <label>Location</label>
         <select id="cm-loc">
           <option value="remote">Remote</option>
           <option value="hybrid">Hybrid</option>
@@ -673,7 +586,7 @@ textarea { resize: vertical; }
         </select>
       </div>
       <div>
-        <label for="cm-stage">Stage</label>
+        <label>Stage</label>
         <select id="cm-stage">
           <option value="0">New / Reviewing</option>
           <option value="1">Applied</option>
@@ -685,13 +598,13 @@ textarea { resize: vertical; }
       </div>
     </div>
     <div class="row">
-      <div><label for="cm-salary">Salary</label><input id="cm-salary" placeholder="e.g. $180K–$220K"></div>
+      <div><label>Salary</label><input id="cm-salary" placeholder="e.g. $180K–$220K"></div>
       <div>
-        <label for="cm-clearance">Clearance required?</label>
+        <label>Clearance required?</label>
         <select id="cm-clearance"><option value="no">No</option><option value="yes">Yes (TS/SCI)</option></select>
       </div>
     </div>
-    <label for="cm-notes">Notes / Recruiter</label>
+    <label>Notes / Recruiter</label>
     <textarea id="cm-notes" rows="2" placeholder="Contact info, source, key details…"></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('card-modal')">Cancel</button>
@@ -706,24 +619,24 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('prep-edit-modal')">✕</button>
     <h3 id="prep-modal-title">New Interview Prep Card</h3>
     <div class="row">
-      <div><label for="pm-company">Company *</label><input id="pm-company" placeholder="e.g. Acme Corp"></div>
-      <div><label for="pm-role">Role *</label><input id="pm-role" placeholder="e.g. Cloud Architect"></div>
+      <div><label>Company *</label><input id="pm-company" placeholder="e.g. Acme Corp"></div>
+      <div><label>Role *</label><input id="pm-role" placeholder="e.g. Cloud Architect"></div>
     </div>
-    <label for="pm-when">Interview Date / Time</label>
+    <label>Interview Date / Time</label>
     <input id="pm-when" placeholder="e.g. Mon Jun 23 · 2:00 PM ET · Zoom">
-    <label for="pm-contact">Contact / Recruiter</label>
+    <label>Contact / Recruiter</label>
     <input id="pm-contact" placeholder="e.g. Jane Smith · jane@company.com">
-    <label for="pm-salary">Salary Target</label>
+    <label>Salary Target</label>
     <input id="pm-salary" placeholder="e.g. Target $180K — do NOT anchor low">
-    <label for="pm-about">Company Overview</label>
+    <label>Company Overview</label>
     <textarea id="pm-about" rows="2" placeholder="What does this company do? Who are their clients?"></textarea>
-    <label for="pm-points">Key Talking Points (one per line)</label>
+    <label>Key Talking Points (one per line)</label>
     <textarea id="pm-points" rows="3" placeholder="Lead with X..&#10;Emphasize Y...&#10;Mention clearance..."></textarea>
-    <label for="pm-questions">Questions to Ask (one per line)</label>
+    <label>Questions to Ask (one per line)</label>
     <textarea id="pm-questions" rows="3" placeholder="What does day 1 look like?&#10;What's the team structure?"></textarea>
-    <label for="pm-keywords">Keywords / Skills to Mention (comma-separated)</label>
+    <label>Keywords / Skills to Mention (comma-separated)</label>
     <input id="pm-keywords" placeholder="AWS, Terraform, FedRAMP, Zero Trust">
-    <label for="pm-watch">Watch-outs / Red Flags</label>
+    <label>Watch-outs / Red Flags</label>
     <textarea id="pm-watch" rows="2" placeholder="Ask about comp structure, confirm remote, check clearance timeline…"></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('prep-edit-modal')">Cancel</button>
@@ -738,16 +651,16 @@ textarea { resize: vertical; }
     <button class="modal-close" onclick="closeModal('star-modal')">✕</button>
     <h3 id="star-modal-title">Add STAR Story</h3>
     <div class="row">
-      <div><label for="sm-lp">Leadership Principle / Theme *</label><input id="sm-lp" placeholder="e.g. Deliver Results"></div>
-      <div><label for="sm-title">Title *</label><input id="sm-title" placeholder="e.g. 1,000-Server Migration"></div>
+      <div><label>Leadership Principle / Theme *</label><input id="sm-lp" placeholder="e.g. Deliver Results"></div>
+      <div><label>Title *</label><input id="sm-title" placeholder="e.g. 1,000-Server Migration"></div>
     </div>
-    <label for="sm-s">Situation</label>
+    <label>Situation</label>
     <textarea id="sm-s" rows="2" placeholder="What was the context and challenge?"></textarea>
-    <label for="sm-t">Task</label>
+    <label>Task</label>
     <textarea id="sm-t" rows="2" placeholder="What were you specifically responsible for?"></textarea>
-    <label for="sm-a">Action</label>
+    <label>Action</label>
     <textarea id="sm-a" rows="3" placeholder="What did you do — specifically and technically?"></textarea>
-    <label for="sm-r">Result (with metrics)</label>
+    <label>Result (with metrics)</label>
     <textarea id="sm-r" rows="2" placeholder="What was the outcome? Include numbers."></textarea>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('star-modal')">Cancel</button>
@@ -761,9 +674,9 @@ textarea { resize: vertical; }
   <div class="modal">
     <button class="modal-close" onclick="closeModal('todo-modal')">✕</button>
     <h3>Add Action Item</h3>
-    <label for="tm-text">Task *</label><input id="tm-text" placeholder="e.g. Follow up with recruiter at Acme">
-    <label for="tm-sub">Detail / Sub-task</label><input id="tm-sub" placeholder="e.g. Jane Smith · jane@acme.com">
-    <label for="tm-priority">Priority</label>
+    <label>Task *</label><input id="tm-text" placeholder="e.g. Follow up with recruiter at Acme">
+    <label>Detail / Sub-task</label><input id="tm-sub" placeholder="e.g. Jane Smith · jane@acme.com">
+    <label>Priority</label>
     <select id="tm-priority"><option value="normal">Normal</option><option value="urgent">Urgent</option></select>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('todo-modal')">Cancel</button>
@@ -785,11 +698,9 @@ textarea { resize: vertical; }
   <div class="modal">
     <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
     <h3>⚙ Settings</h3>
-    <label for="set-client-id">Google OAuth Client ID</label>
-    <input id="set-client-id" placeholder="123456789-abc.apps.googleusercontent.com">
-    <label for="set-rapid-key">RapidAPI Key (for job search)</label>
+    <label>RapidAPI Key (for job search)</label>
     <input id="set-rapid-key" placeholder="Leave blank to disable job board search">
-    <label for="set-anthropic-key">Anthropic API Key (for Resume Scanner)</label>
+    <label>Anthropic API Key (for Resume Scanner)</label>
     <input type="password" id="set-anthropic-key" placeholder="sk-ant-... — stored locally, never sent to any server">
     <div style="font-size:11px;color:var(--muted);margin-top:4px;">Get a key at <a href="https://console.anthropic.com/" target="_blank" class="link">console.anthropic.com</a> · Used only client-side for resume analysis</div>
     <div class="modal-actions">
@@ -848,6 +759,9 @@ textarea { resize: vertical; }
 // ════════════════════════════════════════════════════════════
 // CONFIG & STORAGE
 // ════════════════════════════════════════════════════════════
+// Replace with your closetheoffer.com Google OAuth Client ID
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+
 const USERNAME = (window.location.pathname.split('/').filter(Boolean)[0] || 'default').toLowerCase().replace(/[^a-z0-9_-]/g,'');
 const NS = 'jsd-' + (USERNAME || 'default') + '-';
 const S = {
@@ -876,36 +790,7 @@ let editingStarId = null;
 
 // ════════════════════════════════════════════════════════════
 // SETUP WIZARD
-// ════════════════════════════════════════════════════════════
-let currentStep = 1;
-
-function gotoStep(n) {
-  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.ws').forEach((w,i) => {
-    w.classList.remove('active','done');
-    if (i+1 < n) w.classList.add('done');
-    if (i+1 === n) w.classList.add('active');
-  });
-  document.getElementById('step-'+n).classList.add('active');
-  currentStep = n;
-}
-
-function saveStep1() {
-  const id = document.getElementById('inp-client-id').value.trim();
-  if (!id) { alert('Please enter your Google OAuth Client ID.'); return; }
-  CONFIG.clientId = id;
-  S.set('config', CONFIG);
-  gotoStep(2);
-}
-
-function saveStep2() {
-  const key = document.getElementById('inp-rapid-key').value.trim();
-  if (key) CONFIG.rapidApiKey = key;
-  S.set('config', CONFIG);
-  gotoStep(3);
-}
-
-function skipSetup() {
+function offlineMode() {
   CONFIG.offlineOnly = true;
   S.set('config', CONFIG);
   offlineModeActive = true;
@@ -913,29 +798,12 @@ function skipSetup() {
   initApp();
 }
 
-function launchApp() {
-  if (CONFIG.clientId) {
-    showScreen('screen-auth');
-    initGIS();
-  } else {
-    showScreen('screen-app');
-    initApp();
-  }
-}
-
 // ════════════════════════════════════════════════════════════
 // APP ENTRY POINT
 // ════════════════════════════════════════════════════════════
 function init() {
-  if (CONFIG.clientId) {
-    showScreen('screen-auth');
-    initGIS();
-  } else {
-    offlineModeActive = true;
-    CONFIG.offlineOnly = true;
-    showScreen('screen-app');
-    initApp();
-  }
+  showScreen('screen-auth');
+  initGIS();
 }
 
 function initApp() {
@@ -984,7 +852,7 @@ function initGIS() {
     return;
   }
   tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.clientId,
+    client_id: GOOGLE_CLIENT_ID,
     scope: [
       'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/gmail.readonly',
@@ -1667,21 +1535,18 @@ function deleteTodo(id) {
 // SETTINGS
 // ════════════════════════════════════════════════════════════
 function showSettings() {
-  document.getElementById('set-client-id').value = CONFIG.clientId||'';
   document.getElementById('set-rapid-key').value = CONFIG.rapidApiKey||'';
   document.getElementById('set-anthropic-key').value = CONFIG.anthropicKey||'';
   openModal('settings-modal');
 }
 
 function saveSettings() {
-  CONFIG.clientId    = document.getElementById('set-client-id').value.trim();
-  CONFIG.rapidApiKey = document.getElementById('set-rapid-key').value.trim();
+  CONFIG.rapidApiKey  = document.getElementById('set-rapid-key').value.trim();
   CONFIG.anthropicKey = document.getElementById('set-anthropic-key').value.trim();
   S.set('config', CONFIG);
   closeModal('settings-modal');
   initSearchBadge();
   updateRsApiStatus();
-  if (CONFIG.clientId) initGIS();
   showToast('Settings saved');
 }
 
