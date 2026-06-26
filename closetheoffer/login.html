@@ -94,6 +94,7 @@ function setMode(m) {
     : 'Already have an account? <a href="#" onclick="setMode(\'signin\'); return false;">Sign in</a>';
   clearMessages();
   document.getElementById('inp-password').setAttribute('autocomplete', m === 'signup' ? 'new-password' : 'current-password');
+  document.getElementById('submit-btn').textContent = m === 'signin' ? 'Sign in' : 'Create free account';
 }
 
 function showError(msg) {
