@@ -8,6 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — CloseTheOffer</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;flex-direction:column}
@@ -74,22 +75,11 @@ input:focus{border-color:#6c5ce7}
 </div>
 
 <script>
-/* ─────────────────────────────────────────────────────────
-   WIRE THIS UP ON DAY 2:
-   Replace the stubs below with real Supabase calls.
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 
-   npm install @supabase/supabase-js
-   or load from CDN:
-   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>
-
-   const { createClient } = supabase
-   const sb = createClient('YOUR_SUPABASE_URL', 'YOUR_ANON_KEY')
-
-   Sign in:  sb.auth.signInWithPassword({ email, password })
-   Sign up:  sb.auth.signUp({ email, password })
-   Google:   sb.auth.signInWithOAuth({ provider: 'google' })
-   Session:  sb.auth.getSession()
-───────────────────────────────────────────────────────── */
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let mode = 'signin';
 
@@ -130,35 +120,41 @@ async function handleAuth(e) {
   btn.textContent = mode === 'signin' ? 'Signing in…' : 'Creating account…';
   btn.disabled = true;
 
-  // ── STUB: replace with Supabase call ──
-  // const { data, error } = mode === 'signin'
-  //   ? await sb.auth.signInWithPassword({ email, password })
-  //   : await sb.auth.signUp({ email, password });
-  // if (error) { showError(error.message); btn.disabled=false; btn.textContent=…; return; }
-  // if (mode==='signup') { showSuccess('Check your email to confirm your account!'); }
-  // else { window.location.href = '/dashboard'; }
+  const { data, error } = mode === 'signin'
+    ? await sb.auth.signInWithPassword({ email, password })
+    : await sb.auth.signUp({ email, password });
 
-  // Temporary stub — remove when Supabase is wired up
-  setTimeout(() => {
-    if (mode === 'signup') {
-      showSuccess('✓ Account created! Check your email to confirm, then sign in.');
-    } else {
-      window.location.href = '/dashboard';
-    }
+  if (error) {
+    showError(error.message);
     btn.disabled = false;
     btn.textContent = mode === 'signin' ? 'Sign in' : 'Create free account';
-  }, 800);
+    return;
+  }
+
+  if (mode === 'signup') {
+    showSuccess('✓ Account created! Check your email to confirm your account, then sign in.');
+    btn.disabled = false;
+    btn.textContent = 'Create free account';
+  } else {
+    window.location.href = '/dashboard';
+  }
 }
 
 async function googleSignIn() {
-  // ── STUB: replace with Supabase OAuth ──
-  // await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/dashboard' } });
-  alert('Google sign-in coming soon! Use email/password for now.');
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/dashboard'
+    }
+  });
 }
 
 // Check if already logged in → redirect to dashboard
-// ── STUB: replace with Supabase session check ──
-// sb.auth.getSession().then(({ data }) => { if (data.session) window.location.href = '/dashboard'; });
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) {
+    window.location.href = '/dashboard';
+  }
+});
 </script>
 </body>
 </html>
