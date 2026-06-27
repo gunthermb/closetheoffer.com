@@ -886,9 +886,22 @@ function gotoStep(n) {
   currentStep = n;
 }
 
+// Validate a Google OAuth Client ID format before we hand it to Google.
+// A valid Web-application client ID looks like: 123456789-abc123.apps.googleusercontent.com
+function checkClientId(id) {
+  if (/^[0-9]+-[a-z0-9._-]+\.apps\.googleusercontent\.com$/i.test(id)) return true;
+  alert('That doesn\'t look like a valid Google OAuth Client ID.\n\n'
+    + 'A "Web application" Client ID ends in ".apps.googleusercontent.com", for example:\n'
+    + '  123456789-abc123.apps.googleusercontent.com\n\n'
+    + 'Make sure you copied the full Client ID — not the client secret or an API key — '
+    + 'from a credential of type "Web application" in Google Cloud Console.');
+  return false;
+}
+
 function saveStep1() {
   const id = document.getElementById('inp-client-id').value.trim();
   if (!id) { alert('Please enter your Google OAuth Client ID.'); return; }
+  if (!checkClientId(id)) return;
   CONFIG.clientId = id;
   S.set('config', CONFIG);
   gotoStep(2);
@@ -1668,7 +1681,9 @@ function showSettings() {
 }
 
 function saveSettings() {
-  CONFIG.clientId    = document.getElementById('set-client-id').value.trim();
+  const cid = document.getElementById('set-client-id').value.trim();
+  if (cid && !checkClientId(cid)) return;
+  CONFIG.clientId    = cid;
   CONFIG.rapidApiKey = document.getElementById('set-rapid-key').value.trim();
   S.set('config', CONFIG);
   closeModal('settings-modal');
