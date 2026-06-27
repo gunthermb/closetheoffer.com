@@ -1,6 +1,6 @@
 <!--
   Created by GuntherCloudSolutions
-  Last updated: 2026-06-26 18:29:05
+  Last updated: 2026-06-27 22:20:15
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — CloseTheOffer</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase-config.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;flex-direction:column}
@@ -75,11 +76,9 @@ input:focus{border-color:#6c5ce7}
 </div>
 
 <script>
-// const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-// const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
-
-// const { createClient } = supabase;
-// const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Real Supabase auth. Keys live in /supabase-config.js (getSupabase()).
+const sb = getSupabase();
+if (!sb) console.warn('Supabase not configured yet — add your keys in supabase-config.js.');
 
 let mode = 'signin';
 
@@ -118,33 +117,61 @@ async function handleAuth(e) {
   const email    = document.getElementById('inp-email').value.trim();
   const password = document.getElementById('inp-password').value;
   const btn      = document.getElementById('submit-btn');
+
+  if (!sb) {
+    showError('Authentication isn\'t configured yet. Add your Supabase keys in supabase-config.js.');
+    return;
+  }
+
+  const original = mode === 'signin' ? 'Sign in' : 'Create free account';
   btn.textContent = mode === 'signin' ? 'Signing in…' : 'Creating account…';
   btn.disabled = true;
 
-  // Mocked Auth for local development without Supabase backend
-  setTimeout(() => {
+  try {
     if (mode === 'signup') {
-      showSuccess('✓ Account created! You can now sign in.');
-      btn.disabled = false;
-      btn.textContent = 'Create free account';
-      setTimeout(() => setMode('signin'), 1500);
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) throw error;
+      if (data.session) {
+        // "Confirm email" is OFF → user is signed in immediately.
+        window.location.href = '/dashboard';
+        return;
+      }
+      // "Confirm email" is ON → account created, needs verification.
+      showSuccess('✓ Account created! Check your email for a confirmation link, then sign in.');
+      setTimeout(() => setMode('signin'), 2500);
     } else {
-      localStorage.setItem('mock_user', email);
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       window.location.href = '/dashboard';
+      return;
     }
-  }, 800);
+  } catch (err) {
+    showError(friendlyAuthError(err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
 
 async function googleSignIn() {
-  // Mocked Google Auth
-  localStorage.setItem('mock_user', 'Google User');
-  window.location.href = '/dashboard';
+  clearMessages();
+  if (!sb) {
+    showError('Authentication isn\'t configured yet. Add your Supabase keys in supabase-config.js.');
+    return;
+  }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/dashboard' }
+  });
+  if (error) showError(friendlyAuthError(error));
 }
 
-// Check if already logged in → redirect to dashboard
-if (localStorage.getItem('mock_user')) {
-  window.location.href = '/dashboard';
-}
+// Already signed in? → go straight to the dashboard.
+(async () => {
+  if (!sb) return;
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) window.location.replace('/dashboard');
+})();
 </script>
 </body>
 </html>
