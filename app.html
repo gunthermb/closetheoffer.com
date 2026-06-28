@@ -395,13 +395,6 @@ textarea { resize: vertical; }
           <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">You're all set!</h3>
           <p style="font-size:13px; color:#555; line-height:1.65; margin-bottom:24px;">Your credentials are saved locally in your browser. Nothing is sent to any server.</p>
         </div>
-        <div style="background:var(--subtle); border-radius:10px; padding:16px; margin-bottom:18px; text-align:left;">
-          <div style="font-size:13px; font-weight:700; margin-bottom:6px;">📄 Add your resume (optional)</div>
-          <p style="font-size:12px; color:#555; line-height:1.6; margin-bottom:10px;">Upload a PDF or Word file now and it'll be ready in the Resume Scanner — saved in your browser for next time.</p>
-          <input type="file" id="ob-resume-file" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;" onchange="onboardUploadResume(this)">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('ob-resume-file').click()">📎 Upload PDF / Word</button>
-          <div id="ob-resume-status" style="display:none; font-size:12px; margin-top:8px;"></div>
-        </div>
         <button class="btn btn-primary" style="width:100%; font-size:15px; padding:12px;" onclick="launchApp()">Open Dashboard →</button>
       </div>
     </div>
@@ -424,6 +417,13 @@ textarea { resize: vertical; }
       <div style="margin-top:16px;">
         <button class="btn btn-secondary btn-sm" onclick="showSettings()">⚙ Change credentials</button>
         <button class="btn btn-secondary btn-sm" style="margin-left:6px;" onclick="offlineMode()">Continue offline</button>
+      </div>
+      <div style="margin-top:22px; padding-top:18px; border-top:1px solid var(--border); text-align:left;">
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">📄 Add your resume (optional)</div>
+        <p style="font-size:12px; color:#555; line-height:1.6; margin-bottom:10px;">Upload a PDF or Word file to get started — we'll save it for the Resume Scanner and have it ready next time.</p>
+        <input type="file" id="ob-resume-file" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;" onchange="onboardUploadResume(this)">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('ob-resume-file').click()">📎 Upload PDF / Word</button>
+        <div id="ob-resume-status" style="display:none; font-size:12px; margin-top:8px;"></div>
       </div>
     </div>
   </div>
