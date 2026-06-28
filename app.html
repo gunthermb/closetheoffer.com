@@ -883,6 +883,12 @@ const S = {
 let CONFIG = S.get('config') || {};
 // CONFIG: { clientId, rapidApiKey }
 
+// Shared Google OAuth Web client for CloseTheOffer, so every user doesn't have to
+// create their own. This is authoritative and overrides any stale/invalid clientId
+// previously saved in the browser (which caused "invalid_client" errors).
+const DEFAULT_CLIENT_ID = '802452158790-kn2up59p0c7r1t09ijm5caom4g0usa70.apps.googleusercontent.com';
+CONFIG.clientId = DEFAULT_CLIENT_ID;
+
 let accessToken = null;
 let tokenExpiry = 0;
 let userEmail = '';
