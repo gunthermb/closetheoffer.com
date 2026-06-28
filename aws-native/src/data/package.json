@@ -1,0 +1,7 @@
+{
+  "name": "cto-data",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "CloseTheOffer data Lambda (DynamoDB). Uses the AWS SDK bundled in the Lambda runtime."
+}

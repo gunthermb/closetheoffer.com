@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CloseTheOffer AWS-native hosting — private S3 bucket served by CloudFront (OAC),
+  with a CloudFront Function for clean URLs / routing (replaces vercel.json) and a
+  response-headers policy for the security headers. Replaces Vercel.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: closetheoffer
+
+Resources:
+
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AppName}-site-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  RoutingFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub '${AppName}-routing'
+      AutoPublish: true
+      FunctionConfig:
+        Comment: Clean URLs and rewrites (replaces vercel.json)
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var req = event.request;
+          var uri = req.uri;
+          if (uri === '/') { req.uri = '/index.html'; return req; }
+          if (uri.length > 1 && uri.charAt(uri.length - 1) === '/') {
+            uri = uri.substring(0, uri.length - 1);
+          }
+          var last = uri.substring(uri.lastIndexOf('/') + 1);
+          if (last.indexOf('.') !== -1) { req.uri = uri; return req; }
+          var map = {
+            '/dashboard': '/dashboard.html',
+            '/login': '/login.html',
+            '/signup': '/login.html',
+            '/freemode': '/app-free.html'
+          };
+          if (map[uri]) { req.uri = map[uri]; return req; }
+          var pages = { '/about': 1, '/blog': 1, '/changelog': 1, '/privacy': 1, '/terms': 1, '/index': 1 };
+          if (pages[uri]) { req.uri = uri + '.html'; return req; }
+          var segs = uri.split('/');
+          var count = 0;
+          for (var i = 0; i < segs.length; i++) { if (segs[i]) { count++; } }
+          if (count === 1) { req.uri = '/app.html'; return req; }
+          req.uri = uri + '.html';
+          return req;
+        }
+
+  SecurityHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub '${AppName}-security-headers'
+        SecurityHeadersConfig:
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AppName}-oac'
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: CloseTheOffer static site
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: s3origin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !Ref OriginAccessControl
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: s3origin
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          # AWS managed CachingOptimized policy
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt RoutingFunction.FunctionMetadata.FunctionARN
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: 's3:GetObject'
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+
+Outputs:
+  BucketName:
+    Value: !Ref SiteBucket
+  DistributionId:
+    Value: !Ref Distribution
+  SiteURL:
+    Value: !Sub 'https://${Distribution.DomainName}'

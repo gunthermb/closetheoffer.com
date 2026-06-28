@@ -1,0 +1,7 @@
+{
+  "name": "cto-resume-scan",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "CloseTheOffer resume-scan Lambda (Amazon Bedrock). Uses the AWS SDK bundled in the Lambda runtime."
+}
