@@ -16,8 +16,8 @@
   Row Level Security. Do NOT put the service_role key here.
 */
 
-const SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-PUBLIC-KEY';
+const SUPABASE_URL = 'https://emwrhjmdaxcevqxiyrbe.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_haK80kCzfxKwqYGOCz1aZQ_PLYGufTq';
 
 /* ────────── do not edit below unless you know what you're doing ────────── */
 
