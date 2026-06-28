@@ -706,9 +706,36 @@ textarea { resize: vertical; }
       </style>
       <div class="section-hdr">
         <div class="section-title">Connectors &amp; Job Sites</div>
+        <div class="btn-group">
+          <button class="refresh-btn" onclick="openModal('add-connector-modal')">+ Add Custom</button>
+        </div>
       </div>
       <p style="font-size:13px;color:var(--muted);margin:-4px 0 18px;">Quick links to job boards and aggregators. Sites with a public or free API are tagged <span style="font-size:11px;font-weight:700;background:#e8f5e9;color:#2e7d32;padding:1px 7px;border-radius:6px;">API ↗</span> — click it for the developer docs to get a key. Everything opens in a new tab.</p>
       <div id="connectors-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Connector Modal ── -->
+<div class="modal-bg" id="add-connector-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-connector-modal')">✕</button>
+    <h3>Add Custom Connector</h3>
+    <div class="row" style="margin-bottom:10px;">
+      <div><label for="ac-name">Name *</label><input id="ac-name" placeholder="e.g. My Favorite Board"></div>
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+      <div><label for="ac-url">URL *</label><input id="ac-url" placeholder="https://..."></div>
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+      <div><label for="ac-api">API Docs URL (Optional)</label><input id="ac-api" placeholder="https://..."></div>
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+      <div><label for="ac-note">Note (Optional)</label><input id="ac-note" placeholder="Any extra details"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('add-connector-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomConnector()">Save</button>
     </div>
   </div>
 </div>
@@ -1188,11 +1215,23 @@ async function loadCalendar() {
   
       const existing = pipeline.find(p => p.company.toLowerCase() === company.toLowerCase());
       
-      let stage = 3; // Interview
+      let stage = 3; // Interview (default if it's on the calendar and we don't know)
+      const combined = ((ev.summary||'') + ' ' + (ev.description||'')).toLowerCase();
+      
+      if (combined.includes('offer')) stage = 4;
+      else if (combined.includes('reject') || combined.includes('unfortunately')) stage = 5;
+      else if (combined.includes('interview') || combined.includes('onsite') || combined.includes('panel')) stage = 3;
+      else if (combined.includes('screen') || combined.includes('phone')) stage = 2;
+      else if (combined.includes('applied') || combined.includes('application')) stage = 1;
+      else if (combined.includes('review') || combined.includes('new')) stage = 0;
       
       if (existing) {
-          if (existing.stage < stage && existing.stage !== 5) {
+          if (stage > existing.stage && existing.stage !== 5) {
               existing.stage = stage;
+              existing.notes = (existing.notes + '\n\nUpdate from calendar: ' + (ev.summary||'')).trim();
+              updatedCount++;
+          } else if (stage === 5 && existing.stage !== 5) {
+              existing.stage = 5;
               existing.notes = (existing.notes + '\n\nUpdate from calendar: ' + (ev.summary||'')).trim();
               updatedCount++;
           }
@@ -2003,18 +2042,54 @@ const JOB_SITES = [
 function renderConnectors() {
   const grid = document.getElementById('connectors-grid');
   if (!grid) return;
-  grid.innerHTML = JOB_SITES.map(group => {
-    const cards = group.items.map(s => {
+  
+  const custom = S.get('custom_connectors') || [];
+  let allSites = JOB_SITES;
+  if (custom.length > 0) {
+     allSites = [{ cat: 'My Custom Connectors', items: custom }, ...JOB_SITES];
+  }
+  
+  grid.innerHTML = allSites.map(group => {
+    const cards = group.items.map((s, itemIdx) => {
       const tag = s.api
         ? '<a href="' + s.api + '" target="_blank" rel="noopener" class="conn-api" title="Developer docs / API key">API ↗</a>'
         : '<span class="conn-noapi">link only</span>';
       const note = s.note ? '<div class="conn-note">' + esc(s.note) + '</div>' : '';
-      return '<div class="conn-card">'
-        + '<a href="' + s.url + '" target="_blank" rel="noopener" class="conn-name">' + esc(s.name) + ' ↗</a>'
-        + tag + note + '</div>';
+      const delBtn = (group.cat === 'My Custom Connectors') ? `<button class="refresh-btn" style="position:absolute;top:10px;right:10px;padding:2px 6px;" onclick="deleteCustomConnector(${itemIdx})">✕</button>` : '';
+      return '<div class="conn-card" style="position:relative;">'
+        + '<a href="' + s.url + '" target="_blank" rel="noopener" class="conn-name" style="padding-right:20px;">' + esc(s.name) + ' ↗</a>'
+        + tag + note + delBtn + '</div>';
     }).join('');
     return '<div class="conn-group"><div class="conn-group-title">' + esc(group.cat) + '</div><div class="conn-cards">' + cards + '</div></div>';
   }).join('');
+}
+
+function saveCustomConnector() {
+  const name = document.getElementById('ac-name').value.trim();
+  const url = document.getElementById('ac-url').value.trim();
+  const api = document.getElementById('ac-api').value.trim();
+  const note = document.getElementById('ac-note').value.trim();
+  if(!name || !url) { showToast('Name and URL are required'); return; }
+  
+  const custom = S.get('custom_connectors') || [];
+  custom.push({ name, url, api, note });
+  S.set('custom_connectors', custom);
+  
+  document.getElementById('ac-name').value = '';
+  document.getElementById('ac-url').value = '';
+  document.getElementById('ac-api').value = '';
+  document.getElementById('ac-note').value = '';
+  closeModal('add-connector-modal');
+  renderConnectors();
+  showToast('Custom connector added');
+}
+
+function deleteCustomConnector(idx) {
+    if(!confirm('Delete this custom connector?')) return;
+    const custom = S.get('custom_connectors') || [];
+    custom.splice(idx, 1);
+    S.set('custom_connectors', custom);
+    renderConnectors();
 }
 
 function showTab(name) {
