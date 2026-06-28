@@ -459,6 +459,7 @@ textarea { resize: vertical; }
       <div class="section-hdr">
         <div class="section-title">Opportunity Pipeline</div>
         <div class="btn-group">
+          <button class="refresh-btn" id="btn-sync-email" onclick="scanEmailForPipeline()">↻ Sync from Email</button>
           <button class="refresh-btn" onclick="exportPipeline()">⬇ Export</button>
           <button class="refresh-btn" onclick="document.getElementById('import-file').click()">⬆ Import</button>
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importPipeline(this.files[0])">
@@ -1255,6 +1256,112 @@ async function loadGmail() {
   } catch {
     el.innerHTML = `<div class="no-items" style="color:#c0392b">Could not load Gmail. Make sure Gmail API is enabled in your Google Cloud project.</div>`;
   }
+}
+
+async function scanEmailForPipeline() {
+  if (offlineModeActive) return showToast('Cannot scan email in offline mode');
+  
+  const btn = document.getElementById('btn-sync-email');
+  if(btn) btn.innerText = 'Scanning...';
+  
+  try {
+    const q = 'newer_than:30d (interview OR "application received" OR "thank you for applying" OR "next steps" OR offer OR rejection OR unfortunately)';
+    const list = await gFetch('https://gmail.googleapis.com/gmail/v1/users/me/threads', { q, maxResults: 30 });
+    const threads = (list.threads || []);
+    if (!threads.length) { 
+        showToast('No recent job-related emails found.'); 
+        if(btn) btn.innerText = '↻ Sync from Email';
+        return; 
+    }
+
+    const details = await Promise.allSettled(threads.map(t =>
+      gFetch(`https://gmail.googleapis.com/gmail/v1/users/me/threads/${t.id}`, { maxResults: 1, format: 'metadata', metadataHeaders: 'From,Subject,Date' })
+    ));
+
+    let addedCount = 0;
+    let updatedCount = 0;
+    
+    details.forEach(r => {
+      if (r.status !== 'fulfilled') return;
+      const msg   = (r.value.messages||[])[0] || {};
+      const hdrs  = (msg.payload?.headers||[]);
+      const hdr   = name => (hdrs.find(h=>h.name.toLowerCase()===name.toLowerCase())||{}).value||'';
+      
+      const fromFull = hdr('From');
+      const fromMatch = fromFull.match(/^(?:"?([^"]*)"?\\s)?<?([^>]+)>?$/);
+      let company = 'Unknown Company';
+      if (fromMatch) {
+         if (fromMatch[1] && !fromMatch[1].includes('@') && fromMatch[1].trim().length > 0) {
+             company = fromMatch[1].trim();
+         } else {
+             const email = fromMatch[2];
+             if (email) {
+                 const domain = email.split('@')[1];
+                 if (domain) {
+                     company = domain.split('.')[0];
+                     company = company.charAt(0).toUpperCase() + company.slice(1);
+                 }
+             }
+         }
+      } else {
+          company = fromFull.split('<')[0].trim();
+      }
+      
+      company = company.replace(/\\s+(Inc|LLC|Careers|Talent|Recruiting|Team|Jobs)$/i, '').trim();
+      if (!company) company = "Unknown";
+      
+      const subj = hdr('Subject');
+      const snippet = r.value.snippet || '';
+      const subjLower = subj.toLowerCase();
+      const snipLower = snippet.toLowerCase();
+      
+      let stage = 1; // Applied
+      if (subjLower.includes('interview') || snipLower.includes('interview')) stage = 3;
+      else if (subjLower.includes('offer') || snipLower.includes('offer')) stage = 4;
+      else if (subjLower.includes('rejected') || subjLower.includes('unfortunately') || snipLower.includes('unfortunately') || subjLower.includes('rejection')) stage = 5;
+      
+      const existing = pipeline.find(p => p.company.toLowerCase() === company.toLowerCase());
+      if (existing) {
+          if (stage > existing.stage && stage !== 5 && existing.stage !== 5) {
+              existing.stage = stage;
+              existing.notes = (existing.notes + '\\n\\nUpdate from email: ' + subj).trim();
+              updatedCount++;
+          } else if (stage === 5 && existing.stage !== 5) {
+              existing.stage = stage;
+              existing.notes = (existing.notes + '\\n\\nUpdate from email: ' + subj).trim();
+              updatedCount++;
+          }
+      } else {
+          const today = new Date().toISOString().slice(0, 10);
+          pipeline.push({ 
+              id: 'c-' + Date.now() + Math.random().toString(36).substr(2, 5), 
+              company, 
+              role: 'Unknown Role', 
+              loc: 'remote', 
+              salary: '', 
+              clearance: 'no', 
+              stage, 
+              notes: 'From email: ' + subj, 
+              added: today, 
+              stageDate: today 
+          });
+          addedCount++;
+      }
+    });
+    
+    if (addedCount > 0 || updatedCount > 0) {
+        S.set('pipeline', pipeline);
+        renderPipeline();
+        showToast(`Synced! Added ${addedCount}, Updated ${updatedCount}.`);
+    } else {
+        showToast('Sync complete. No new updates found.');
+    }
+    
+  } catch (err) {
+      console.error(err);
+      showToast('Error syncing from email');
+  }
+  if(btn) btn.innerText = '↻ Sync from Email';
 }
 
 // ════════════════════════════════════════════════════════════
