@@ -545,8 +545,13 @@ textarea { resize: vertical; }
 
         <div class="two-col" style="gap:16px;align-items:flex-start;">
           <div style="flex:2;min-width:0;">
-            <label for="rs-resume-text">Paste Your Resume Text *</label>
-            <textarea id="rs-resume-text" rows="18" placeholder="Paste your full resume here as plain text…&#10;&#10;Include all sections: Summary, Work Experience, Education, Skills, etc.&#10;The more complete, the better the analysis."></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+              <label for="rs-resume-text" style="margin:0;">Paste Your Resume Text *</label>
+              <input type="file" id="rs-resume-file" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;" onchange="uploadResume(this)">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('rs-resume-file').click()">📎 Upload PDF / Word</button>
+            </div>
+            <div id="rs-resume-file-status" style="display:none;font-size:12px;margin-bottom:6px;"></div>
+            <textarea id="rs-resume-text" rows="18" placeholder="Paste your full resume here as plain text…&#10;&#10;Include all sections: Summary, Work Experience, Education, Skills, etc.&#10;Or upload a PDF / Word file above and we'll pull the text out for you.&#10;The more complete, the better the analysis."></textarea>
           </div>
           <div style="flex:1;min-width:200px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
@@ -1785,6 +1790,89 @@ let scanResults = null;
 let fwIssues = [];
 let fwIndex = 0;
 let fwFixed = new Set();
+
+// ── Resume file upload (PDF / Word → text) ──────────────────
+// Parser libraries are loaded from CDN on first use (lazy).
+const PDFJS_SRC    = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const MAMMOTH_SRC  = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector('script[data-src="' + src + '"]')) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.setAttribute('data-src', src);
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('Could not load required library. Check your connection.'));
+    document.head.appendChild(s);
+  });
+}
+
+function rsFileStatus(msg, color) {
+  const el = document.getElementById('rs-resume-file-status');
+  if (!el) return;
+  el.style.display = msg ? '' : 'none';
+  el.style.color = color || 'var(--muted)';
+  el.textContent = msg || '';
+}
+
+async function extractPdfText(arrayBuffer) {
+  await loadScript(PDFJS_SRC);
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it => it.str).join(' ') + '\n';
+  }
+  return text.replace(/[ \t]+\n/g, '\n').trim();
+}
+
+async function extractDocxText(arrayBuffer) {
+  await loadScript(MAMMOTH_SRC);
+  const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+  return (result.value || '').trim();
+}
+
+async function uploadResume(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const name  = file.name;
+  const lower = name.toLowerCase();
+  const isPdf  = lower.endsWith('.pdf')  || file.type === 'application/pdf';
+  const isDocx = lower.endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+  if (lower.endsWith('.doc') && !isDocx) {
+    rsFileStatus('⚠️ Old ".doc" files aren\'t supported. Please re-save as .docx or PDF.', '#b45309');
+    input.value = ''; return;
+  }
+  if (!isPdf && !isDocx) {
+    rsFileStatus('⚠️ Unsupported file type. Please upload a PDF or Word (.docx) file.', '#c0392b');
+    input.value = ''; return;
+  }
+  if (file.size > 15 * 1024 * 1024) {
+    rsFileStatus('⚠️ That file is over 15 MB. Please upload a smaller resume.', '#c0392b');
+    input.value = ''; return;
+  }
+
+  rsFileStatus('⏳ Reading "' + name + '"…');
+  try {
+    const buf = await file.arrayBuffer();
+    const text = isPdf ? await extractPdfText(buf) : await extractDocxText(buf);
+    if (!text) {
+      rsFileStatus('⚠️ No text found in "' + name + '". If it\'s a scanned/image PDF, paste the text manually.', '#b45309');
+      return;
+    }
+    document.getElementById('rs-resume-text').value = text;
+    rsFileStatus('✓ Loaded "' + name + '" — ' + text.length.toLocaleString() + ' characters. Review below, then Analyze.', '#2e7d32');
+  } catch (e) {
+    rsFileStatus('⚠️ Could not read "' + name + '": ' + (e.message || e), '#c0392b');
+  } finally {
+    input.value = '';
+  }
+}
 
 function updateRsApiStatus() {
   const notice = document.getElementById('rs-key-notice');
