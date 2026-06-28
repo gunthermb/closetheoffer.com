@@ -451,6 +451,7 @@ textarea { resize: vertical; }
       <div class="tab" onclick="showTab('prep')">📋 Interview Prep</div>
       <div class="tab" onclick="showTab('actions')">✅ Action Items</div>
       <div class="tab" onclick="showTab('resume')">📄 Resume Scan</div>
+      <div class="tab" onclick="showTab('connectors')">🔌 Connectors</div>
     </div>
 
     <!-- ── Pipeline ── -->
@@ -686,6 +687,27 @@ textarea { resize: vertical; }
           <div id="email-list"><div class="loading">Loading Gmail…</div></div>
         </div>
       </div>
+    </div>
+
+    <!-- ── Connectors / Job Sites ── -->
+    <div class="tab-panel" id="panel-connectors">
+      <style>
+      .conn-group{margin-bottom:22px}
+      .conn-group-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+      .conn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+      .conn-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+      .conn-name{font-weight:700;font-size:13px;color:var(--text);text-decoration:none}
+      .conn-name:hover{color:var(--purple)}
+      .conn-api{align-self:flex-start;font-size:11px;font-weight:700;background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:6px;text-decoration:none}
+      .conn-api:hover{background:#d6efd8}
+      .conn-noapi{align-self:flex-start;font-size:11px;color:var(--muted)}
+      .conn-note{font-size:11px;color:var(--muted)}
+      </style>
+      <div class="section-hdr">
+        <div class="section-title">Connectors &amp; Job Sites</div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin:-4px 0 18px;">Quick links to job boards and aggregators. Sites with a public or free API are tagged <span style="font-size:11px;font-weight:700;background:#e8f5e9;color:#2e7d32;padding:1px 7px;border-radius:6px;">API ↗</span> — click it for the developer docs to get a key. Everything opens in a new tab.</p>
+      <div id="connectors-grid"></div>
     </div>
   </div>
 </div>
@@ -1002,6 +1024,7 @@ function initApp() {
   renderTodos();
   updateRsApiStatus();
   restoreResume();
+  renderConnectors();
   if (!offlineModeActive) {
     loadCalendar();
     loadGmail();
@@ -1761,6 +1784,73 @@ function clearAllData() {
 // ════════════════════════════════════════════════════════════
 // UI UTILITIES
 // ════════════════════════════════════════════════════════════
+// ── Connectors: job sites with links + API docs ─────────────
+const JOB_SITES = [
+  { cat: 'Public / free APIs', items: [
+    { name: 'USAJOBS (US federal)', url: 'https://www.usajobs.gov', api: 'https://developer.usajobs.gov/' },
+    { name: 'The Muse', url: 'https://www.themuse.com', api: 'https://www.themuse.com/developers/api/v2' },
+    { name: 'Adzuna', url: 'https://www.adzuna.com', api: 'https://developer.adzuna.com/' },
+    { name: 'Reed (UK)', url: 'https://www.reed.co.uk', api: 'https://www.reed.co.uk/developers' },
+    { name: 'Jooble', url: 'https://jooble.org', api: 'https://jooble.org/api/about' },
+    { name: 'Careerjet', url: 'https://www.careerjet.com', api: 'https://www.careerjet.com/partners/api/' },
+    { name: 'JSearch (aggregator · RapidAPI)', url: 'https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch', api: 'https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch', note: 'Powers the Job Search tab' },
+  ]},
+  { cat: 'Remote-focused (free APIs)', items: [
+    { name: 'Remotive', url: 'https://remotive.com', api: 'https://github.com/remotive-com/remote-jobs-api' },
+    { name: 'Remote OK', url: 'https://remoteok.com', api: 'https://remoteok.com/api' },
+    { name: 'Arbeitnow', url: 'https://www.arbeitnow.com', api: 'https://www.arbeitnow.com/api/job-board-api' },
+    { name: 'Jobicy', url: 'https://jobicy.com', api: 'https://jobicy.com/api/v2/remote-jobs' },
+    { name: 'Findwork', url: 'https://findwork.dev', api: 'https://findwork.dev/developers/' },
+    { name: 'Himalayas', url: 'https://himalayas.app', api: 'https://himalayas.app/jobs/api' },
+    { name: 'We Work Remotely', url: 'https://weworkremotely.com', api: 'https://weworkremotely.com/remote-jobs.rss', note: 'RSS feed' },
+    { name: 'Remote.co', url: 'https://remote.co' },
+    { name: 'FlexJobs', url: 'https://www.flexjobs.com' },
+  ]},
+  { cat: 'ATS job-board APIs (per company)', items: [
+    { name: 'Greenhouse boards', url: 'https://boards.greenhouse.io', api: 'https://developers.greenhouse.io/job-board.html' },
+    { name: 'Lever postings', url: 'https://jobs.lever.co', api: 'https://github.com/lever/postings-api' },
+    { name: 'Ashby', url: 'https://jobs.ashbyhq.com', api: 'https://developers.ashbyhq.com/docs/public-job-posting-api' },
+    { name: 'SmartRecruiters', url: 'https://www.smartrecruiters.com', api: 'https://developers.smartrecruiters.com/docs/posting-api' },
+    { name: 'Workable', url: 'https://www.workable.com', api: 'https://workable.readme.io/' },
+  ]},
+  { cat: 'Major boards', items: [
+    { name: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs' },
+    { name: 'Indeed', url: 'https://www.indeed.com' },
+    { name: 'Glassdoor', url: 'https://www.glassdoor.com' },
+    { name: 'ZipRecruiter', url: 'https://www.ziprecruiter.com' },
+    { name: 'Monster', url: 'https://www.monster.com' },
+    { name: 'SimplyHired', url: 'https://www.simplyhired.com' },
+    { name: 'CareerBuilder', url: 'https://www.careerbuilder.com' },
+    { name: 'Google for Jobs', url: 'https://www.google.com/search?q=jobs&ibp=htl;jobs' },
+  ]},
+  { cat: 'Tech & startups', items: [
+    { name: 'Dice', url: 'https://www.dice.com' },
+    { name: 'Built In', url: 'https://builtin.com' },
+    { name: 'Wellfound (AngelList)', url: 'https://wellfound.com' },
+    { name: 'Y Combinator · Work at a Startup', url: 'https://www.workatastartup.com' },
+    { name: 'Otta', url: 'https://otta.com' },
+    { name: 'Hired', url: 'https://hired.com' },
+    { name: 'Hacker News · Who Is Hiring', url: 'https://hn.algolia.com/?query=who%20is%20hiring', api: 'https://hn.algolia.com/api', note: 'HN Search API' },
+  ]},
+];
+
+function renderConnectors() {
+  const grid = document.getElementById('connectors-grid');
+  if (!grid) return;
+  grid.innerHTML = JOB_SITES.map(group => {
+    const cards = group.items.map(s => {
+      const tag = s.api
+        ? '<a href="' + s.api + '" target="_blank" rel="noopener" class="conn-api" title="Developer docs / API key">API ↗</a>'
+        : '<span class="conn-noapi">link only</span>';
+      const note = s.note ? '<div class="conn-note">' + esc(s.note) + '</div>' : '';
+      return '<div class="conn-card">'
+        + '<a href="' + s.url + '" target="_blank" rel="noopener" class="conn-name">' + esc(s.name) + ' ↗</a>'
+        + tag + note + '</div>';
+    }).join('');
+    return '<div class="conn-group"><div class="conn-group-title">' + esc(group.cat) + '</div><div class="conn-cards">' + cards + '</div></div>';
+  }).join('');
+}
+
 function showTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
