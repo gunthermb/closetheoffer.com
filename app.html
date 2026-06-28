@@ -395,6 +395,13 @@ textarea { resize: vertical; }
           <h3 style="font-size:18px; font-weight:800; margin-bottom:8px;">You're all set!</h3>
           <p style="font-size:13px; color:#555; line-height:1.65; margin-bottom:24px;">Your credentials are saved locally in your browser. Nothing is sent to any server.</p>
         </div>
+        <div style="background:var(--subtle); border-radius:10px; padding:16px; margin-bottom:18px; text-align:left;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:6px;">📄 Add your resume (optional)</div>
+          <p style="font-size:12px; color:#555; line-height:1.6; margin-bottom:10px;">Upload a PDF or Word file now and it'll be ready in the Resume Scanner — saved in your browser for next time.</p>
+          <input type="file" id="ob-resume-file" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;" onchange="onboardUploadResume(this)">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('ob-resume-file').click()">📎 Upload PDF / Word</button>
+          <div id="ob-resume-status" style="display:none; font-size:12px; margin-top:8px;"></div>
+        </div>
         <button class="btn btn-primary" style="width:100%; font-size:15px; padding:12px;" onclick="launchApp()">Open Dashboard →</button>
       </div>
     </div>
@@ -994,6 +1001,7 @@ function initApp() {
   renderStarStories();
   renderTodos();
   updateRsApiStatus();
+  restoreResume();
   if (!offlineModeActive) {
     loadCalendar();
     loadGmail();
@@ -1809,12 +1817,27 @@ function loadScript(src) {
   });
 }
 
-function rsFileStatus(msg, color) {
-  const el = document.getElementById('rs-resume-file-status');
+function rsStatusEl(id, msg, color) {
+  const el = document.getElementById(id);
   if (!el) return;
   el.style.display = msg ? '' : 'none';
   el.style.color = color || 'var(--muted)';
   el.textContent = msg || '';
+}
+
+function saveResume(text, name) {
+  try { S.set('resume', { text: text, name: name, savedAt: Date.now() }); } catch (e) {}
+}
+function getStoredResume() {
+  try { return S.get('resume'); } catch (e) { return null; }
+}
+// On load, restore a previously-uploaded resume into the scanner textarea.
+function restoreResume() {
+  const r = getStoredResume();
+  if (!r || !r.text) return;
+  const ta = document.getElementById('rs-resume-text');
+  if (ta && !ta.value.trim()) ta.value = r.text;
+  if (r.name) rsStatusEl('rs-resume-file-status', '✓ Loaded your saved resume "' + r.name + '". Upload a new file to replace it.', '#2e7d32');
 }
 
 async function extractPdfText(arrayBuffer) {
@@ -1836,8 +1859,8 @@ async function extractDocxText(arrayBuffer) {
   return (result.value || '').trim();
 }
 
-async function uploadResume(input) {
-  const file = input.files && input.files[0];
+// Core: validate, extract text, fill the scanner textarea (if present), persist, report status.
+async function ingestResumeFile(file, statusId) {
   if (!file) return;
   const name  = file.name;
   const lower = name.toLowerCase();
@@ -1845,33 +1868,39 @@ async function uploadResume(input) {
   const isDocx = lower.endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
   if (lower.endsWith('.doc') && !isDocx) {
-    rsFileStatus('⚠️ Old ".doc" files aren\'t supported. Please re-save as .docx or PDF.', '#b45309');
-    input.value = ''; return;
+    rsStatusEl(statusId, '⚠️ Old ".doc" files aren\'t supported. Please re-save as .docx or PDF.', '#b45309'); return;
   }
   if (!isPdf && !isDocx) {
-    rsFileStatus('⚠️ Unsupported file type. Please upload a PDF or Word (.docx) file.', '#c0392b');
-    input.value = ''; return;
+    rsStatusEl(statusId, '⚠️ Unsupported file type. Please upload a PDF or Word (.docx) file.', '#c0392b'); return;
   }
   if (file.size > 15 * 1024 * 1024) {
-    rsFileStatus('⚠️ That file is over 15 MB. Please upload a smaller resume.', '#c0392b');
-    input.value = ''; return;
+    rsStatusEl(statusId, '⚠️ That file is over 15 MB. Please upload a smaller resume.', '#c0392b'); return;
   }
 
-  rsFileStatus('⏳ Reading "' + name + '"…');
-  try {
-    const buf = await file.arrayBuffer();
-    const text = isPdf ? await extractPdfText(buf) : await extractDocxText(buf);
-    if (!text) {
-      rsFileStatus('⚠️ No text found in "' + name + '". If it\'s a scanned/image PDF, paste the text manually.', '#b45309');
-      return;
-    }
-    document.getElementById('rs-resume-text').value = text;
-    rsFileStatus('✓ Loaded "' + name + '" — ' + text.length.toLocaleString() + ' characters. Review below, then Analyze.', '#2e7d32');
-  } catch (e) {
-    rsFileStatus('⚠️ Could not read "' + name + '": ' + (e.message || e), '#c0392b');
-  } finally {
-    input.value = '';
+  rsStatusEl(statusId, '⏳ Reading "' + name + '"…');
+  const buf = await file.arrayBuffer();
+  const text = isPdf ? await extractPdfText(buf) : await extractDocxText(buf);
+  if (!text) {
+    rsStatusEl(statusId, '⚠️ No text found in "' + name + '". If it\'s a scanned/image PDF, paste the text manually.', '#b45309'); return;
   }
+  const ta = document.getElementById('rs-resume-text');
+  if (ta) ta.value = text;
+  saveResume(text, name);
+  rsStatusEl(statusId, '✓ Saved "' + name + '" — ' + text.length.toLocaleString() + ' characters. It\'ll be ready in the Resume Scanner next time too.', '#2e7d32');
+}
+
+// Entry point: upload from the Resume Scanner tab.
+async function uploadResume(input) {
+  try { await ingestResumeFile(input.files && input.files[0], 'rs-resume-file-status'); }
+  catch (e) { rsStatusEl('rs-resume-file-status', '⚠️ Could not read the file: ' + (e.message || e), '#c0392b'); }
+  finally { input.value = ''; }
+}
+
+// Entry point: upload during onboarding (setup wizard).
+async function onboardUploadResume(input) {
+  try { await ingestResumeFile(input.files && input.files[0], 'ob-resume-status'); }
+  catch (e) { rsStatusEl('ob-resume-status', '⚠️ Could not read the file: ' + (e.message || e), '#c0392b'); }
+  finally { input.value = ''; }
 }
 
 function updateRsApiStatus() {
