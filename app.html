@@ -1157,8 +1157,67 @@ async function loadCalendar() {
       return JOB_KEYWORDS.test(full) || hasOtherPeople;
     };
 
-    renderIntCards('upcoming-grid', (future.items||[]).filter(filter), false);
-    renderIntCards('past-grid', (past.items||[]).filter(filter).reverse(), true);
+    const upcomingEvents = (future.items||[]).filter(filter);
+    const pastEvents = (past.items||[]).filter(filter).reverse();
+
+    renderIntCards('upcoming-grid', upcomingEvents, false);
+    renderIntCards('past-grid', pastEvents, true);
+    
+    // Sync to pipeline
+    let addedCount = 0;
+    let updatedCount = 0;
+    
+    [...upcomingEvents, ...pastEvents].forEach(ev => {
+      let company = 'Unknown Company';
+      const orgEmail = ev.organizer?.email || '';
+      const orgName = ev.organizer?.displayName || '';
+      if (orgName && !orgName.includes('@')) {
+          company = orgName.trim();
+      } else if (orgEmail) {
+          const domain = orgEmail.split('@')[1];
+          if (domain && !domain.includes('gmail.com') && !domain.includes('google.com')) {
+              company = domain.split('.')[0];
+              company = company.charAt(0).toUpperCase() + company.slice(1);
+          } else {
+              company = (ev.summary || 'Unknown').split(' ')[0];
+          }
+      }
+      
+      company = company.replace(/\s+(Inc|LLC|Careers|Talent|Recruiting|Team|Jobs)$/i, '').trim();
+      if (!company) company = "Unknown";
+  
+      const existing = pipeline.find(p => p.company.toLowerCase() === company.toLowerCase());
+      
+      let stage = 3; // Interview
+      
+      if (existing) {
+          if (existing.stage < stage && existing.stage !== 5) {
+              existing.stage = stage;
+              existing.notes = (existing.notes + '\n\nUpdate from calendar: ' + (ev.summary||'')).trim();
+              updatedCount++;
+          }
+      } else {
+          const today = new Date().toISOString().slice(0, 10);
+          pipeline.push({ 
+              id: 'c-' + Date.now() + Math.random().toString(36).substr(2, 5), 
+              company, 
+              role: 'Unknown Role (Calendar)', 
+              loc: 'remote', 
+              salary: '', 
+              clearance: 'no', 
+              stage, 
+              notes: 'From calendar: ' + (ev.summary||''), 
+              added: today, 
+              stageDate: today 
+          });
+          addedCount++;
+      }
+    });
+    
+    if (addedCount > 0 || updatedCount > 0) {
+        S.set('pipeline', pipeline);
+        renderPipeline();
+    }
   } catch(e) {
     document.getElementById('upcoming-grid').innerHTML =
       '<div class="no-items">Could not load calendar. Make sure you\'re signed in and Google Calendar API is enabled.</div>';
