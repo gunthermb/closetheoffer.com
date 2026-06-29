@@ -8,8 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — CloseTheOffer</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase-config.js"></script>
+<script src="/aws-config.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;flex-direction:column}
@@ -76,9 +75,8 @@ input:focus{border-color:#6c5ce7}
 </div>
 
 <script>
-// Real Supabase auth. Keys live in /supabase-config.js (getSupabase()).
-const sb = getSupabase();
-if (!sb) console.warn('Supabase not configured yet — add your keys in supabase-config.js.');
+// Amazon Cognito auth. Config + helpers live in /aws-config.js.
+if (typeof AWS_CONFIGURED !== 'undefined' && !AWS_CONFIGURED) console.warn('AWS not configured yet — fill in aws-config.js.');
 
 let mode = 'signin';
 
@@ -118,8 +116,8 @@ async function handleAuth(e) {
   const password = document.getElementById('inp-password').value;
   const btn      = document.getElementById('submit-btn');
 
-  if (!sb) {
-    showError('Authentication isn\'t configured yet. Add your Supabase keys in supabase-config.js.');
+  if (typeof AWS_CONFIGURED !== 'undefined' && !AWS_CONFIGURED) {
+    showError('Authentication isn\'t configured yet (aws-config.js).');
     return;
   }
 
@@ -129,21 +127,20 @@ async function handleAuth(e) {
 
   try {
     if (mode === 'signup') {
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) throw error;
-      if (data.session) {
-        // "Confirm email" is OFF → user is signed in immediately.
-        window.location.href = '/dashboard';
-        return;
+      await ctoSignUp(email, password);
+      // Cognito emails a 6-digit code (not a link). Confirm it now.
+      const code = prompt('We emailed you a 6-digit confirmation code.\nEnter it here to finish creating your account:');
+      if (code && code.trim()) {
+        await ctoConfirmSignUp(email, code.trim());
+        showSuccess('✓ Account confirmed! You can now sign in.');
+        setTimeout(() => setMode('signin'), 1500);
+      } else {
+        showSuccess('Account created. Enter the emailed code next time, then sign in.');
       }
-      // "Confirm email" is ON → account created, needs verification.
-      showSuccess('✓ Account created! Check your email for a confirmation link, then sign in.');
-      setTimeout(() => setMode('signin'), 2500);
     } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      window.location.href = '/dashboard';
-      return;
+      const r = await ctoSignIn(email, password);
+      if (r && r.AuthenticationResult) { window.location.href = '/dashboard'; return; }
+      throw new Error('Sign-in did not complete. Please try again.');
     }
   } catch (err) {
     showError(friendlyAuthError(err));
@@ -155,23 +152,17 @@ async function handleAuth(e) {
 
 async function googleSignIn() {
   clearMessages();
-  if (!sb) {
-    showError('Authentication isn\'t configured yet. Add your Supabase keys in supabase-config.js.');
+  if (typeof AWS_CONFIGURED !== 'undefined' && !AWS_CONFIGURED) {
+    showError('Authentication isn\'t configured yet (aws-config.js).');
     return;
   }
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard' }
-  });
-  if (error) showError(friendlyAuthError(error));
+  ctoGoogleSignIn(); // redirects to the Cognito hosted UI (Google)
 }
 
 // Already signed in? → go straight to the dashboard.
-(async () => {
-  if (!sb) return;
-  const { data } = await sb.auth.getSession();
-  if (data && data.session) window.location.replace('/dashboard');
-})();
+if (typeof ctoTokenValid === 'function' && ctoTokenValid()) {
+  window.location.replace('/dashboard');
+}
 </script>
 </body>
 </html>

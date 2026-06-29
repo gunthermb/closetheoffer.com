@@ -17,12 +17,12 @@ Parameters:
     Default: https://closetheoffer.com/login
   AllowedOrigin:
     Type: String
-    Default: https://closetheoffer.com
-    Description: CORS origin allowed to call the API.
+    Default: '*'
+    Description: CORS origin allowed to call the API (the JWT is the real guard).
   BedrockModelId:
     Type: String
-    Default: anthropic.claude-3-5-haiku-20241022-v1:0
-    Description: A Claude model ID you have enabled in Bedrock model access.
+    Default: us.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: A callable Bedrock model/inference-profile ID (region-prefixed for inference profiles).
   GoogleClientId:
     Type: String
     Default: ''
@@ -150,9 +150,13 @@ Resources:
           BEDROCK_MODEL_ID: !Ref BedrockModelId
       Policies:
         - Statement:
+            # Inference profiles route across regions, so allow the profile in this
+            # account plus the underlying foundation models in any region.
             - Effect: Allow
-              Action: ['bedrock:InvokeModel']
-              Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
+              Action: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream']
+              Resource:
+                - 'arn:aws:bedrock:*::foundation-model/*'
+                - !Sub 'arn:aws:bedrock:*:${AWS::AccountId}:inference-profile/*'
       Events:
         Scan:
           Type: HttpApi

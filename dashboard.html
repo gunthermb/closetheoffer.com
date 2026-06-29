@@ -8,8 +8,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — CloseTheOffer</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase-config.js"></script>
+<script src="/aws-config.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7ff;min-height:100vh;display:flex;align-items:center;justify-content:center}
@@ -29,27 +28,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <script>
 /*
-  Auth gate: require a valid Supabase session, then load the app.
-  Also handles the OAuth callback (Supabase reads the token from the URL
-  via detectSessionInUrl, set in supabase-config.js).
+  Auth gate (Amazon Cognito): finish any Google hosted-UI redirect (?code=...),
+  then require a valid session before loading the app.
 */
 (async () => {
-  const sb = getSupabase();
-
   // Not configured yet → load the app directly so local development still works.
-  if (!sb) {
+  if (typeof AWS_CONFIGURED !== 'undefined' && !AWS_CONFIGURED) {
     window.location.replace('/app.html');
     return;
   }
 
-  // After Google OAuth the session may still be settling from the URL hash.
-  let { data } = await sb.auth.getSession();
-  if (!data.session && window.location.hash.includes('access_token')) {
-    await new Promise(r => setTimeout(r, 400));
-    ({ data } = await sb.auth.getSession());
-  }
+  // If we came back from "Continue with Google", exchange the code for tokens.
+  try { await ctoHandleOAuthRedirect(); } catch (e) {}
 
-  if (!data.session) {
+  if (!ctoTokenValid()) {
     window.location.replace('/login');
     return;
   }

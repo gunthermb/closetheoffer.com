@@ -9,17 +9,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Job Search Dashboard</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase-config.js"></script>
+<script src="/aws-config.js"></script>
+<script src="/seed-data.js"></script>
 <script>
-  // Account gate: require a signed-in user (no-op until Supabase keys are set).
+  // Account gate (Amazon Cognito): require a signed-in user.
   // To make this app publicly reachable per-username, remove this block.
   (async () => {
-    const session = await requireSession('/login');
-    if (session && session.user) {
-      window.__ctoSession = session;
+    const token = await requireSession('/login');
+    if (token) {
       document.addEventListener('DOMContentLoaded', () => {
-        const email = session.user.email || '';
+        let email = '';
+        try { email = JSON.parse(atob(token.split('.')[1])).email || ''; } catch (e) {}
         const e1 = document.getElementById('user-email-display');
         const av = document.getElementById('user-avatar');
         if (e1) e1.textContent = email;
@@ -452,6 +452,7 @@ textarea { resize: vertical; }
       <div class="tab" onclick="showTab('actions')">✅ Action Items</div>
       <div class="tab" onclick="showTab('resume')">📄 Resume Scan</div>
       <div class="tab" onclick="showTab('connectors')">🔌 Connectors</div>
+      <div class="tab" onclick="showTab('automations')">⚙️ Automations</div>
     </div>
 
     <!-- ── Pipeline ── -->
@@ -616,6 +617,35 @@ textarea { resize: vertical; }
             </div>
           </div>
         </div>
+
+        <!-- ── Stored Resume + AI Rewrite (ATS + CAR) ── -->
+        <div id="rs-store-card" style="margin-top:18px;border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--subtle);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+            <div style="font-weight:800;font-size:14px;color:var(--text);">📝 Stored Resume &amp; AI Rewrite</div>
+            <span id="rs-store-status" style="font-size:12px;color:var(--muted);">No resume stored yet.</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:8px 0 12px;">
+            Upload a Word (.docx) resume above to store it here — it stays saved in this browser and reloads next time.
+            Then have AI rewrite it for <strong>ATS</strong> (clean structure, keyword coverage) and <strong>CAR</strong>
+            (Challenge · Action · Result bullets with metrics), and download the optimized version as a Word document.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-secondary btn-sm" id="rs-download-original" onclick="downloadStoredResume()" style="display:none;">⬇ Download stored Word file</button>
+            <button class="btn btn-primary btn-sm" id="rs-rewrite-btn" onclick="aiRewriteResume()">✨ AI Rewrite for ATS &amp; CAR</button>
+            <span style="font-size:11px;color:var(--muted);">Uses the resume text (and JD, if added) above.</span>
+          </div>
+          <div id="rs-rewrite-result" style="display:none;margin-top:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+              <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Optimized resume</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="downloadRewriteWord()">⬇ Download as Word</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyRewriteText()">📋 Copy text</button>
+              </div>
+            </div>
+            <div id="rs-rewrite-changes" style="font-size:12px;color:#444;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.6;display:none;"></div>
+            <div id="rs-rewrite-preview" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:18px 22px;max-height:520px;overflow:auto;font-size:13px;line-height:1.55;color:#1a1a2e;"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Job Title Suggestions Results -->
@@ -712,6 +742,28 @@ textarea { resize: vertical; }
       </div>
       <p style="font-size:13px;color:var(--muted);margin:-4px 0 18px;">Quick links to job boards and aggregators. Sites with a public or free API are tagged <span style="font-size:11px;font-weight:700;background:#e8f5e9;color:#2e7d32;padding:1px 7px;border-radius:6px;">API ↗</span> — click it for the developer docs to get a key. Everything opens in a new tab.</p>
       <div id="connectors-grid"></div>
+    </div>
+
+    <!-- ── Automations ── -->
+    <div class="tab-panel" id="panel-automations">
+      <style>
+      .auto-card{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--surface);margin-bottom:14px}
+      .auto-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+      .auto-title{font-weight:800;font-size:15px;color:var(--text);display:flex;align-items:center;gap:8px}
+      .auto-cadence{font-size:11px;font-weight:700;background:#ede9fe;color:#6c5ce7;padding:3px 9px;border-radius:6px;white-space:nowrap}
+      .auto-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px}
+      .auto-on{background:#e8f5e9;color:#2e7d32}
+      .auto-off{background:#f1f5f9;color:#64748b}
+      .auto-desc{font-size:13px;color:var(--text);line-height:1.6;margin:8px 0 10px}
+      .auto-steps{font-size:12px;color:var(--muted);line-height:1.6;padding-left:18px;margin:0}
+      .auto-steps li{margin-bottom:3px}
+      .auto-meta{font-size:11px;color:var(--muted);margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
+      </style>
+      <div class="section-hdr">
+        <div class="section-title">Automations</div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin:-4px 0 18px;">Scheduled tasks that keep your pipeline current. These run in Cowork on the cadence shown and update this dashboard automatically. Toggle, reschedule, or run them from Cowork &rarr; Scheduled Tasks.</p>
+      <div id="automations-list"></div>
     </div>
   </div>
 </div>
@@ -962,6 +1014,26 @@ let pipeline   = S.get('pipeline') || [];
 let prepCards  = S.get('prep')     || [];
 let starStories= S.get('stars')    || [];
 let todos      = S.get('todos')    || [];
+
+// Seed from the Job Search Dashboard (seed-data.js). Pipeline merges by id so
+// user edits/new cards are never lost; prep & STAR seed only when empty.
+(function seedFromDashboard(){
+  try {
+    var seed = window.CTO_SEED; if (!seed) return;
+    if (Array.isArray(seed.pipeline) && seed.pipeline.length) {
+      var have = {}; pipeline.forEach(function(c){ if(c&&c.id) have[c.id]=1; });
+      seed.pipeline.forEach(function(c){ if(c&&c.id&&!have[c.id]) pipeline.push(c); });
+      S.set('pipeline', pipeline);
+    }
+    if ((!prepCards || !prepCards.length) && Array.isArray(seed.prep) && seed.prep.length) {
+      prepCards = seed.prep.slice(); S.set('prep', prepCards);
+    }
+    if ((!starStories || !starStories.length) && Array.isArray(seed.stars) && seed.stars.length) {
+      starStories = seed.stars.slice(); S.set('stars', starStories);
+    }
+  } catch(e){ console.warn('seed skipped', e); }
+})();
+
 let editingCardId = null;
 let editingPrepId = null;
 let editingStarId = null;
@@ -1053,6 +1125,7 @@ function initApp() {
   updateRsApiStatus();
   restoreResume();
   renderConnectors();
+  renderAutomations();
   if (!offlineModeActive) {
     loadCalendar();
     loadGmail();
@@ -2064,6 +2137,67 @@ function renderConnectors() {
   }).join('');
 }
 
+// ── Automations: the 4 scheduled tasks that keep the pipeline current ──
+const AUTOMATIONS = [
+  {
+    icon: '🔎', name: 'Daily AWS Job Listings', cadence: 'Mon–Fri, 7:00 AM', on: true,
+    desc: 'Finds fresh AWS Architect/Engineer roles ($180K+ or $90/hr+, remote or DC-metro), excludes anything you\'ve already applied to, and auto-adds new opportunities to your Pipeline.',
+    steps: [
+      'Scan Gmail sent folder (90d) for jobs already applied to',
+      'Search ZipRecruiter / Dice / Indeed for roles posted in the last 1–2 days',
+      'Filter by salary, location, and TS-clearance fit',
+      'Add net-new companies to the Pipeline as Stage 0 cards',
+    ],
+  },
+  {
+    icon: '🔄', name: 'Dashboard Refresh', cadence: 'Twice daily, 8 AM & 6 PM', on: true,
+    desc: 'Pulls job-related events from your Google Calendar and reconciles them against the pipeline, adding new interview/recruiter events that aren\'t represented yet.',
+    steps: [
+      'Fetch calendar events from −90d to +60d',
+      'Keep interview / recruiter / hiring events; skip personal items',
+      'Compare against existing pipeline cards',
+      'Add or update cards when new job events appear',
+    ],
+  },
+  {
+    icon: '📬', name: 'Gmail Pipeline Sync', cadence: 'Daily, 7 AM', on: true,
+    desc: 'Scans your inbox for recruiter replies on active pipeline companies, classifies each (advance / reject / waiting / action needed), and flags stale cards with no recent activity.',
+    steps: [
+      'Search last 7 days for emails from/about pipeline companies',
+      'Classify each: ADVANCE · REJECT · WAITING · ACTION_NEEDED',
+      'Flag stale cards (Screening 7d+, Interview 5d+, Applied 14d+)',
+      'Report only — you decide what to move',
+    ],
+  },
+  {
+    icon: '📋', name: 'Interview Prep Blocks', cadence: 'Daily, 7 AM', on: true,
+    desc: 'Checks your calendar for interviews in the next 48 hours and auto-creates a 30-minute prep block 24 hours before each one (if you don\'t already have prep time blocked).',
+    steps: [
+      'Fetch job-related events for the next 48 hours',
+      'Check whether a prep block already exists',
+      'Create a 30-min "📋 Interview Prep — [Company]" event 24h prior',
+      'Links back to your talking points & STAR stories here',
+    ],
+  },
+];
+
+function renderAutomations() {
+  const el = document.getElementById('automations-list');
+  if (!el) return;
+  el.innerHTML = AUTOMATIONS.map(a => `
+    <div class="auto-card">
+      <div class="auto-top">
+        <div class="auto-title">${a.icon} ${esc(a.name)}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="auto-cadence">${esc(a.cadence)}</span>
+          <span class="auto-status ${a.on ? 'auto-on' : 'auto-off'}">${a.on ? '● Active' : '○ Paused'}</span>
+        </div>
+      </div>
+      <div class="auto-desc">${esc(a.desc)}</div>
+      <ul class="auto-steps">${a.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+    </div>`).join('');
+}
+
 function saveCustomConnector() {
   const name = document.getElementById('ac-name').value.trim();
   const url = document.getElementById('ac-url').value.trim();
@@ -2156,8 +2290,14 @@ function rsStatusEl(id, msg, color) {
   el.textContent = msg || '';
 }
 
-function saveResume(text, name) {
-  try { S.set('resume', { text: text, name: name, savedAt: Date.now() }); } catch (e) {}
+function saveResume(text, name, dataUrl, mime) {
+  // Always store the text. Try to also store the original file (Word/PDF) bytes so
+  // it can be re-downloaded — but localStorage is ~5MB, so fall back to text-only
+  // if the file is too big to persist.
+  const base = { text: text, name: name, savedAt: Date.now() };
+  if (dataUrl && dataUrl.length < 4_000_000) { base.dataUrl = dataUrl; base.mime = mime || ''; }
+  try { S.set('resume', base); }
+  catch (e) { try { S.set('resume', { text: text, name: name, savedAt: Date.now() }); } catch (e2) {} }
 }
 function getStoredResume() {
   try { return S.get('resume'); } catch (e) { return null; }
@@ -2165,10 +2305,39 @@ function getStoredResume() {
 // On load, restore a previously-uploaded resume into the scanner textarea.
 function restoreResume() {
   const r = getStoredResume();
-  if (!r || !r.text) return;
+  if (!r || !r.text) { renderStoredResume(); return; }
   const ta = document.getElementById('rs-resume-text');
   if (ta && !ta.value.trim()) ta.value = r.text;
   if (r.name) rsStatusEl('rs-resume-file-status', '✓ Loaded your saved resume "' + r.name + '". Upload a new file to replace it.', '#2e7d32');
+  renderStoredResume();
+}
+
+// Reflect the stored resume in the "Stored Resume & AI Rewrite" card.
+function renderStoredResume() {
+  const status = document.getElementById('rs-store-status');
+  const dlBtn  = document.getElementById('rs-download-original');
+  const r = getStoredResume();
+  if (!status) return;
+  if (r && r.name) {
+    const when = r.savedAt ? new Date(r.savedAt).toLocaleDateString() : '';
+    status.textContent = '✓ Stored: "' + r.name + '"' + (when ? ' · saved ' + when : '');
+    status.style.color = '#2e7d32';
+    if (dlBtn) dlBtn.style.display = r.dataUrl ? '' : 'none';
+  } else {
+    status.textContent = 'No resume stored yet.';
+    status.style.color = 'var(--muted)';
+    if (dlBtn) dlBtn.style.display = 'none';
+  }
+}
+
+// Re-download the original stored Word/PDF file.
+function downloadStoredResume() {
+  const r = getStoredResume();
+  if (!r || !r.dataUrl) { showToast('No stored file to download'); return; }
+  const a = document.createElement('a');
+  a.href = r.dataUrl;
+  a.download = r.name || 'resume';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 async function extractPdfText(arrayBuffer) {
@@ -2216,8 +2385,22 @@ async function ingestResumeFile(file, statusId) {
   }
   const ta = document.getElementById('rs-resume-text');
   if (ta) ta.value = text;
-  saveResume(text, name);
-  rsStatusEl(statusId, '✓ Saved "' + name + '" — ' + text.length.toLocaleString() + ' characters. It\'ll be ready in the Resume Scanner next time too.', '#2e7d32');
+  // Keep the original Word/PDF bytes (as a data URL) so it can be re-downloaded.
+  const mime = isPdf ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  let dataUrl = '';
+  try { dataUrl = await blobToDataURL(new Blob([buf], { type: mime })); } catch (e) {}
+  saveResume(text, name, dataUrl, mime);
+  renderStoredResume();
+  rsStatusEl(statusId, '✓ Saved "' + name + '" — ' + text.length.toLocaleString() + ' characters. Stored for re-download and AI rewrite.', '#2e7d32');
+}
+
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(blob);
+  });
 }
 
 // Entry point: upload from the Resume Scanner tab.
@@ -2623,14 +2806,169 @@ function closeFixWizard() {
 }
 
 // ════════════════════════════════════════════════════════════
+// AI RESUME REWRITE (ATS + CAR)
+// ════════════════════════════════════════════════════════════
+let rsRewriteData = null; // last AI-rewritten resume (structured)
+
+async function aiRewriteResume() {
+  const resumeText = (document.getElementById('rs-resume-text').value || '').trim();
+  if (!resumeText) { alert('Add or upload your resume text above first.'); return; }
+  if (typeof AWS_CONFIGURED !== 'undefined' && (!AWS_CONFIGURED || !ctoIdToken())) {
+    alert('Please sign in to use the AI rewrite.'); return;
+  }
+  const jd = (document.getElementById('rs-jd-text').value || '').trim();
+  const btn = document.getElementById('rs-rewrite-btn');
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = '✨ Rewriting…';
+
+  const prompt = `You are an expert resume writer specializing in ATS optimization and the CAR (Challenge-Action-Result) bullet format.
+
+Rewrite the resume below so it is:
+- ATS-friendly: standard section headers, no tables/columns/graphics, clean reverse-chronological structure, strong keyword coverage.
+- CAR-formatted: every experience bullet follows Challenge → Action → Result, starts with a strong past-tense action verb, uses "I"-implied voice (no "I"/"we"), and quantifies impact with numbers, %, $, scale, or time wherever the source supports it. Never invent facts or metrics that aren't supported by the source resume.
+${jd ? 'Tailor wording and keywords to this target job description (weave in genuinely-matching keywords; do not fabricate experience):\n"""\n' + jd + '\n"""\n' : ''}
+SOURCE RESUME:
+"""
+${resumeText}
+"""
+
+Return ONLY this JSON (no markdown fences, no commentary):
+{
+  "name": "<candidate full name, or empty string>",
+  "contact": "<single line: email · phone · location · LinkedIn, as available>",
+  "summary": "<2-3 sentence professional summary, keyword-rich>",
+  "skills": ["<skill/keyword>", "..."],
+  "experience": [
+    { "role": "<title>", "company": "<company>", "location": "<loc or empty>", "dates": "<e.g. 2021–Present>", "bullets": ["<CAR bullet with metric>", "..."] }
+  ],
+  "education": [ { "credential": "<degree/cert>", "school": "<institution>", "dates": "<years or empty>" } ],
+  "certifications": ["<cert>", "..."],
+  "changes": ["<short note of a key improvement made>", "..."],
+  "ats_keywords_added": ["<keyword newly surfaced>", "..."]
+}`;
+
+  try {
+    const resp = await fetch(API_BASE_URL + '/scan', {
+      method: 'POST',
+      headers: {
+        'Authorization': (typeof ctoIdToken === 'function' ? ctoIdToken() : '') || '',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || ('HTTP ' + resp.status));
+    }
+    const data  = await resp.json();
+    const raw   = data.content?.[0]?.text || '';
+    const clean = raw.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    rsRewriteData = JSON.parse(clean);
+    renderRewrite(rsRewriteData);
+  } catch (e) {
+    showToast('Rewrite failed: ' + (e.message || e));
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
+}
+
+function resumeToHtml(d) {
+  if (!d) return '';
+  const sec = t => '<h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#6c5ce7;border-bottom:1px solid #ddd;padding-bottom:3px;margin:16px 0 8px;">' + esc(t) + '</h2>';
+  let h = '';
+  if (d.name)    h += '<h1 style="font-size:20px;margin:0 0 2px;color:#1a1a2e;">' + esc(d.name) + '</h1>';
+  if (d.contact) h += '<div style="font-size:12px;color:#555;margin-bottom:6px;">' + esc(d.contact) + '</div>';
+  if (d.summary) { h += sec('Professional Summary') + '<p style="margin:0;">' + esc(d.summary) + '</p>'; }
+  if (d.skills && d.skills.length) { h += sec('Core Skills') + '<p style="margin:0;">' + d.skills.map(esc).join(' · ') + '</p>'; }
+  if (d.experience && d.experience.length) {
+    h += sec('Professional Experience');
+    d.experience.forEach(x => {
+      h += '<div style="margin-bottom:10px;">'
+        + '<div style="font-weight:700;">' + esc(x.role || '') + (x.company ? ' — ' + esc(x.company) : '') + '</div>'
+        + '<div style="font-size:11px;color:#777;">' + [x.location, x.dates].filter(Boolean).map(esc).join(' · ') + '</div>'
+        + '<ul style="margin:5px 0 0;padding-left:18px;">' + (x.bullets || []).map(b => '<li style="margin-bottom:3px;">' + esc(b) + '</li>').join('') + '</ul>'
+        + '</div>';
+    });
+  }
+  if (d.education && d.education.length) {
+    h += sec('Education');
+    d.education.forEach(e => { h += '<div>' + esc(e.credential || '') + (e.school ? ', ' + esc(e.school) : '') + (e.dates ? ' (' + esc(e.dates) + ')' : '') + '</div>'; });
+  }
+  if (d.certifications && d.certifications.length) {
+    h += sec('Certifications') + '<ul style="margin:0;padding-left:18px;">' + d.certifications.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
+  }
+  return h;
+}
+
+function renderRewrite(d) {
+  const wrap = document.getElementById('rs-rewrite-result');
+  document.getElementById('rs-rewrite-preview').innerHTML = resumeToHtml(d);
+  const changesEl = document.getElementById('rs-rewrite-changes');
+  const changes = (d.changes || []).concat((d.ats_keywords_added || []).length ? ['Keywords surfaced: ' + d.ats_keywords_added.join(', ')] : []);
+  if (changes.length) {
+    changesEl.style.display = '';
+    changesEl.innerHTML = '<strong>What changed:</strong><ul style="margin:5px 0 0;padding-left:18px;">' + changes.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>';
+  } else { changesEl.style.display = 'none'; }
+  wrap.style.display = '';
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Build a Word-openable .doc from the rewritten resume and download it.
+function downloadRewriteWord() {
+  if (!rsRewriteData) { showToast('Run the AI rewrite first'); return; }
+  const body = resumeToHtml(rsRewriteData);
+  const html = '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
+    + '<head><meta charset="utf-8"><title>Resume</title>'
+    + '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#000;}'
+    + 'h1{font-size:18pt;} h2{font-size:12pt;} ul{margin-top:4px;}</style></head>'
+    + '<body>' + body + '</body></html>';
+  const blob = new Blob(['﻿', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const base = (rsRewriteData.name || 'resume').replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'resume';
+  const a = document.createElement('a');
+  a.href = url; a.download = base + '_ATS_CAR.doc';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function copyRewriteText() {
+  if (!rsRewriteData) { showToast('Run the AI rewrite first'); return; }
+  const d = rsRewriteData;
+  let t = '';
+  if (d.name) t += d.name + '\n';
+  if (d.contact) t += d.contact + '\n';
+  if (d.summary) t += '\nPROFESSIONAL SUMMARY\n' + d.summary + '\n';
+  if (d.skills && d.skills.length) t += '\nCORE SKILLS\n' + d.skills.join(' · ') + '\n';
+  if (d.experience && d.experience.length) {
+    t += '\nPROFESSIONAL EXPERIENCE\n';
+    d.experience.forEach(x => {
+      t += (x.role || '') + (x.company ? ' — ' + x.company : '') + '\n';
+      t += [x.location, x.dates].filter(Boolean).join(' · ') + '\n';
+      (x.bullets || []).forEach(b => { t += '• ' + b + '\n'; });
+      t += '\n';
+    });
+  }
+  if (d.education && d.education.length) {
+    t += 'EDUCATION\n';
+    d.education.forEach(e => { t += (e.credential || '') + (e.school ? ', ' + e.school : '') + (e.dates ? ' (' + e.dates + ')' : '') + '\n'; });
+  }
+  if (d.certifications && d.certifications.length) t += '\nCERTIFICATIONS\n' + d.certifications.map(c => '• ' + c).join('\n') + '\n';
+  navigator.clipboard.writeText(t.trim()).then(() => showToast('Resume text copied'), () => showToast('Copy failed'));
+}
+
+// ════════════════════════════════════════════════════════════
 // STAR STORY GENERATOR
 // ════════════════════════════════════════════════════════════
 let sgGeneratedStories = []; // [{lp, title, s, t, a, r, best_for}]
 
 function openGenerateStarModal() {
-  if (!CONFIG.anthropicKey) {
-    alert('Please add your Anthropic API key in Settings first.\n\nGet one free at console.anthropic.com');
-    showSettings();
+  if (typeof AWS_CONFIGURED !== 'undefined' && (!AWS_CONFIGURED || !ctoIdToken())) {
+    alert('Please sign in to use the AI features.');
     return;
   }
 
@@ -2718,13 +3056,11 @@ Return ONLY this JSON (no markdown, no explanation):
 }`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(API_BASE_URL + '/scan', {
       method: 'POST',
       headers: {
-        'x-api-key': CONFIG.anthropicKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': (typeof ctoIdToken === 'function' ? ctoIdToken() : '') || '',
         'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
@@ -2841,9 +3177,8 @@ async function suggestJobTitles() {
   const resumeText = document.getElementById('rs-resume-text').value.trim();
   if (!resumeText) { alert('Paste your resume text first, then click this button.'); return; }
 
-  if (!CONFIG.anthropicKey) {
-    alert('Please add your Anthropic API key in Settings first.\n\nGet one free at console.anthropic.com');
-    showSettings();
+  if (typeof AWS_CONFIGURED !== 'undefined' && (!AWS_CONFIGURED || !ctoIdToken())) {
+    alert('Please sign in to use the AI features.');
     return;
   }
 
@@ -2888,13 +3223,11 @@ Return ONLY this JSON:
 Sort by match score descending. Be specific — reference actual skills, tools, or experiences from the resume. Salary ranges should reflect ${locationLabel} market rates.`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(API_BASE_URL + '/scan', {
       method: 'POST',
       headers: {
-        'x-api-key': CONFIG.anthropicKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': (typeof ctoIdToken === 'function' ? ctoIdToken() : '') || '',
         'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',

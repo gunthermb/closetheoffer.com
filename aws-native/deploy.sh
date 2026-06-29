@@ -14,16 +14,19 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 
 echo "==> 1/4  Deploy backend (Cognito + API + Bedrock + DynamoDB)"
 # Optional Google login: export GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET first.
+PARAMS="AppName=$APP"
+if [ -n "${GOOGLE_CLIENT_ID:-}" ]; then
+  PARAMS="$PARAMS GoogleClientId=$GOOGLE_CLIENT_ID GoogleClientSecret=${GOOGLE_CLIENT_SECRET:-}"
+fi
 sam deploy \
   --region "$REGION" \
   --stack-name "${APP}-backend" \
   --template-file "$HERE/infrastructure/backend.yaml" \
   --capabilities CAPABILITY_IAM \
   --resolve-s3 \
-  --parameter-overrides \
-      AppName="$APP" \
-      GoogleClientId="${GOOGLE_CLIENT_ID:-}" \
-      GoogleClientSecret="${GOOGLE_CLIENT_SECRET:-}"
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset \
+  --parameter-overrides $PARAMS
 
 echo "==> backend outputs (paste these into frontend/aws-config.js):"
 aws cloudformation describe-stacks --region "$REGION" --stack-name "${APP}-backend" \
